@@ -1,0 +1,50 @@
+#
+# Ansible Playbook for installing Magento 2
+#
+# Readme:
+#   1. Add the hosts you want to run this Playbook on to Ansible:
+#     $ nano /etc/ansible/hosts
+#   2. Update the config.env file to add platform-specific values
+#   3. Run this command to install Magento 2:
+#     $ ansible-playbook m2.yml
+#
+---
+- hosts: m2
+  tasks:
+  - name: install packages
+    apt: name={{ item }} update_cache=yes state=latest
+    with_items:
+      - php
+      - php-curl
+      - php-dom
+      - php-xsl
+      - php-intl
+      - php-mbstring
+      - php-zip
+      - php-simplexml
+      - php-gd
+      - php-mcrypt
+      - php-mysql
+      - php-opcache
+      - php-soap
+      - php-bcmath
+      - php-json
+      - php-common
+      - composer
+      - postfix
+  - name: copy config.env
+    copy:
+      src: config.env
+      dest: /tmp/config.env
+  - name: 1 prepare composer
+    script: scripts/1-prepare-composer.sh
+  - name: 2 prepare database
+    script: scripts/2-prepare-database.sh
+  - name: 3 prepare magento 2
+    script: scripts/3-prepare-magento2.sh
+  - name: 4 install magento 2
+    script: scripts/4-install-magento2.sh
+  - name: 5 setup magento 2
+    script: scripts/5-setup-magento2.sh
+  - name: 6 set production settings
+    script: scripts/6-set-production-settings.sh
