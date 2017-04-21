@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . config.env
+set -a; . `pwd`/config.env
 cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches

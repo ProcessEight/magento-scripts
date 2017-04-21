@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . /var/www/html/deploytest2.localhost.com/config.env
+set -a; . `pwd`/config.env
 
 echo "
 #

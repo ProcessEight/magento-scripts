@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . config.env
+set -a; . `pwd`/config.env
 cd $MAGENTO2_ENV_WEBROOT
 
 bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \

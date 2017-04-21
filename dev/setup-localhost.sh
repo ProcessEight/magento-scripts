@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . config.env
+set -a; . `pwd`/config.env
 
 # Cleanup
 sudo rm -f /etc/nginx/sites-enabled/$MAGENTO2_ENV_HOSTNAME.conf
