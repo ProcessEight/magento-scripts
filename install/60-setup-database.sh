@@ -3,7 +3,6 @@ set -a; . config.env
 cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
-cd $MAGENTO2_ENV_WEBROOT
 bin/magento maintenance:enable
 
 # Don't remove the files we just generated

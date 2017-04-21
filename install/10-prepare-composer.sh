@@ -10,4 +10,4 @@ echo "{
          \"password\": \"$MAGENTO2_PRIVATE_KEY\"
       }
    }
-}" # > ~/.composer/auth.json
+}" > ~/.composer/auth.json

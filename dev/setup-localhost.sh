@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -a; . config.env
 
+# Cleanup
+sudo rm -f /etc/nginx/sites-enabled/$MAGENTO2_ENV_HOSTNAME.conf
+sudo rm -f /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME.conf
+
 sudo echo "
 # Uncomment this if you don't already have a fastcgi_backend defined
 #upstream fastcgi_backend {
