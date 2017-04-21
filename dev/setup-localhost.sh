@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . install.env
+set -a; . config.env
 
 sudo echo "
 # Uncomment this if you don't already have a fastcgi_backend defined

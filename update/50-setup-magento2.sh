@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . update.env
+set -a; . config.env
 cd $MAGENTO2_ENV_WEBROOT
 
 # Code generation

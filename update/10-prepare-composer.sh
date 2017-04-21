@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . update.env
+set -a; . config.env
 
 echo "{
    \"http-basic\": {

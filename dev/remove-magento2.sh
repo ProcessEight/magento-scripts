@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -a; . install.env
+set -a; . config.env
 
 rm -rf $MAGENTO2_ENV_WEBROOT
 

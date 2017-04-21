@@ -4,6 +4,7 @@ cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
 bin/magento cache:enable
+
 # We skip compilation here because we've already done in the previous step
 bin/magento deploy:mode:set production --skip-compilation
 
