@@ -4,6 +4,9 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config.env
 
+# Composer parallel install plugin
+composer global require hirak/prestissimo
+
 mkdir -p $MAGENTO2_ENV_WEBROOT
 cd $MAGENTO2_ENV_WEBROOT
 composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION

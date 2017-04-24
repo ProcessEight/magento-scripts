@@ -8,12 +8,8 @@ cd $MAGENTO2_ENV_WEBROOT
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
 bin/magento maintenance:enable
 
-# Force correct ownership on files
-#find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Force correct ownership on directories
-#find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-
 # Code generation
+
 if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
 then
     # For multisites running Magento 2.0.x only
@@ -29,7 +25,7 @@ rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
+    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
 bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme

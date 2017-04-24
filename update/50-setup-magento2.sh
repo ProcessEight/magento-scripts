@@ -24,7 +24,7 @@ rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE"
+    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE"
 fi
 bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
