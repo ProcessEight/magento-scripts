@@ -4,6 +4,12 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config.env
 
+COMPOSER_CMD=$(which composer)
+if [[ "" == "$COMPOSER_CMD" ]]
+then
+    wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer
+fi
+
 mkdir -p ~/.composer/
 
 echo "{

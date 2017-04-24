@@ -4,29 +4,13 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config.env
 
-#echo "Checking for Composer"
 COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]
 then
-#    echo "Installing Composer"
-    EXPECTED_SIGNATURE=$(wget -q -O - https://composer.github.io/installer.sig)
-    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-    ACTUAL_SIGNATURE=$(php -r "echo hash_file('SHA384', 'composer-setup.php');")
-
-    if [ "$EXPECTED_SIGNATURE" != "$ACTUAL_SIGNATURE" ]
-    then
-        >&2 echo 'ERROR: Invalid Composer installer signature'
-        rm composer-setup.php
-        exit 1
-    fi
-    php composer-setup.php --quiet --filename=composer --install-dir=
-    RESULT=$?
-    rm composer-setup.php
-    COMPOSER_CMD=$(which composer)
-else
-#    echo "Updating Composer"
-    $COMPOSER_CMD selfupdate
+    wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer
 fi
+
+mkdir -p ~/.composer/
 
 echo "{
    \"http-basic\": {
