@@ -4,6 +4,6 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config.env
 
-if [[ $MAGENTO2_DB_BACKUPFIRST ]];
-then mysqldump -u root --password=password $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
+if [[ $MAGENTO2_DB_BACKUPFIRST == "true" ]];
+then echo "abc123" #mysqldump -u root --password=password $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi

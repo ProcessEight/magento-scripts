@@ -14,7 +14,7 @@ bin/magento maintenance:enable
 #find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 
 # Code generation
-if [[ $MAGENTO2_ENV_MULTITENANT ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
 then
     # For multisites running Magento 2.0.x only
     bin/magento setup:di:compile-multi-tenant
@@ -28,8 +28,8 @@ fi
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE"
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
+    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
 bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
