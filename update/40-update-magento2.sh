@@ -5,5 +5,11 @@
 set -a; . `pwd`/config.env
 cd $MAGENTO2_ENV_WEBROOT
 
-# Pull in latest changes using git
-git pull
+# Composer parallel install plugin
+composer global require hirak/prestissimo
+
+# Install the project
+# Reads the composer.lock file and installs/updates all dependencies to the specified version
+composer install
+
+bin/magento module:enable --all

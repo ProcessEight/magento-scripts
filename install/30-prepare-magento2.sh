@@ -9,7 +9,10 @@ composer global require hirak/prestissimo
 
 mkdir -p $MAGENTO2_ENV_WEBROOT
 cd $MAGENTO2_ENV_WEBROOT
+
+echo "# Create a new, blank Magento 2 install"
 composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+
 echo "# Make sure we can execute the CLI tool"
 chmod u+x bin/magento
 echo "# Force correct permissions on files"

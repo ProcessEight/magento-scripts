@@ -9,7 +9,7 @@ cd $MAGENTO2_ENV_WEBROOT
 
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/*
-if [[ $MAGENTO2_ENV_MULTITENANT ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
 # For multisites running Magento 2.0.x only
 then
     bin/magento setup:di:compile-multi-tenant
@@ -23,9 +23,10 @@ fi
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE"
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
+    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
+echo $DEPLOY_COMMAND
 bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
 bin/magento setup:static-content:deploy en_US --theme Magento/backend

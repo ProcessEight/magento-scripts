@@ -20,5 +20,3 @@ echo "{
       }
    }
 }" > ~/.composer/auth.json
-
-exit $RESULT

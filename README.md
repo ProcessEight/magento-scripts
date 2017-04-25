@@ -1,6 +1,6 @@
 # Magento 2 Deployment
 
-## Setup
+## First-time Setup
 
 ```bash
 git clone git@bitbucket.org:purenetgit/magento2-deployment.git
@@ -14,7 +14,7 @@ To use the scripts to install a new Magento 2 instance:
 $ mkdir projectname
 $ cd projectname
 $ ln -s /var/www/html/magento2-deployment/install install
-$ cp install/config.env.sample config.env
+$ cp config.env.sample config.env
 ```
 
 Now update the `config.env` file, then:
@@ -31,7 +31,7 @@ To use the scripts to update an existing Magento 2 instance:
 ```bash
 $ cd /var/www/html/projectname
 $ ln -s /var/www/html/magento2-deployment/update update
-$ cp update/config.env.sample config.env
+$ cp config.env.sample config.env
 ```
 
 Now update the `config.env` file, then:
