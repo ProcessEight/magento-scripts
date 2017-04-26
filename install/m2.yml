@@ -34,7 +34,7 @@
       - postfix
   - name: copy config.env
     copy:
-      src: config.env
+      src: ../config.env
       dest: /tmp/config.env
   - name: 1 prepare composer
     script: install/10-prepare-composer.sh
