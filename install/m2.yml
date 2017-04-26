@@ -37,16 +37,16 @@
       src: ../config.env
       dest: /tmp/config.env
   - name: 1 prepare composer
-    script: install/10-prepare-composer.sh
+    script: 10-prepare-composer.sh
   - name: 2 prepare database
-    script: install/20-prepare-database.sh
+    script: 20-prepare-database.sh
   - name: 3 prepare magento 2
-    script: install/30-prepare-magento2.sh
+    script: 30-prepare-magento2.sh
   - name: 4 install magento 2
-    script: install/40-install-magento2.sh
+    script: 40-install-magento2.sh
   - name: 5 setup magento 2
-    script: install/50-setup-magento2.sh
+    script: 50-setup-magento2.sh
   - name: 5 setup database
-    script: install/60-setup-database.sh
+    script: 60-setup-database.sh
   - name: 6 set production settings
-    script: install/70-set-production-settings.sh
+    script: 70-set-production-settings.sh
