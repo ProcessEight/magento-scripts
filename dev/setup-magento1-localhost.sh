@@ -20,7 +20,7 @@ server {
 
     location / {
         index index.php;
-        try_files $uri $uri/ @handler;
+        try_files \$uri \$uri/ @handler;
         expires 30d;
     }
 
@@ -32,8 +32,8 @@ server {
     location ^~ /report/config.xml   { deny all; }
     location ^~ /var/                { deny all; }
 
-    location ~* (.+)\.(\d+)\.(js|css|png|jpg|jpeg|gif)$ {
-        try_files $uri $1.$3;
+    location ~* (.+)\.(\d+)\.(js|css|png|jpg|jpeg|gif)\$ {
+        try_files \$uri \$1.\$3;
     }
 
     location  /. {
@@ -49,17 +49,17 @@ server {
     }
 
     location ~ .php/ {
-        rewrite ^(.*.php)/ $1 last;
+        rewrite ^(.*.php)/ \$1 last;
     }
 
     location ~ \.php$ {
-        if (!-e $request_filename) { rewrite / /index.php last; }
+        if (!-e \$request_filename) { rewrite / /index.php last; }
 
         expires                 off;
         #fastcgi_pass           phpupstream;
         fastcgi_pass            unix:/run/php/php7.0-fpm.sock;
         fastcgi_read_timeout    3600;
-        fastcgi_param           SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param           SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
         fastcgi_param           MAGE_IS_DEVELOPER_MODE 1;
         include                 fastcgi_params;
     }

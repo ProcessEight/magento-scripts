@@ -1,0 +1,31 @@
+#
+# Ansible Playbook for updating Magento 2
+#
+# Readme:
+#   1. Add the hosts you want to run this Playbook on to Ansible:
+#     $ nano /etc/ansible/hosts
+#   2. Update the config.env file to add platform-specific values
+#   3. Run this command to update Magento 2:
+#     $ ansible-playbook m2.yml
+#
+---
+- hosts: m2
+  tasks:
+  - name: copy config.env
+    copy:
+      src: config.env
+      dest: /tmp/config.env
+  - name: 1 prepare composer
+    script: scripts/update/10-prepare-composer.sh
+  - name: 2 prepare database
+    script: scripts/update/20-prepare-database.sh
+  - name: 3 prepare magento 2
+    script: scripts/update/30-prepare-magento2.sh
+  - name: 4 update magento 2
+    script: scripts/update/40-update-magento2.sh
+  - name: 5 setup magento 2
+    script: scripts/update/50-setup-magento2.sh
+  - name: 5 setup database
+    script: scripts/update/60-setup-database.sh
+  - name: 6 set production settings
+    script: scripts/update/70-set-production-settings.sh

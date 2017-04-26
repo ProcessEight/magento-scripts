@@ -6,7 +6,7 @@
 git clone git@bitbucket.org:purenetgit/magento2-deployment.git
 ```
 
-## Install
+## Install locally
 
 To use the scripts to install a new Magento 2 instance:
 
@@ -24,7 +24,7 @@ $ cd /var/www/html/projectname
 $ ./install/05-run-all-steps.sh
 ```
 
-## Update
+## Update locally
 
 To use the scripts to update an existing Magento 2 instance:
 
@@ -39,4 +39,42 @@ Now update the `config.env` file, then:
 ```bash
 $ cd /var/www/html/projectname
 $ ./update/05-run-all-steps.sh
+```
+
+## Install with Ansible
+
+To use Ansible to install a new Magento 2 instance:
+
+Add the hosts you want to run this Playbook on to Ansible:
+```bash
+$ nano /etc/ansible/hosts
+```
+
+Update the config.env file to add platform-specific values
+```bash
+cp config.env.sample config.env
+```
+
+Run this command to install Magento 2:
+```bash
+$ ansible-playbook install/m2.yml
+```
+
+## Update with Ansible
+
+To use Ansible to update an existing Magento 2 instance:
+
+Add the hosts you want to run this Playbook on to Ansible:
+```bash
+$ nano /etc/ansible/hosts
+```
+
+Update the config.env file to add platform-specific values
+```bash
+cp config.env.sample config.env
+```
+
+Run this command to install Magento 2:
+```bash
+$ ansible-playbook update/m2.yml
 ```
