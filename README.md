@@ -29,7 +29,7 @@ $ ./install/05-run-all-steps.sh
 To use the scripts to update an existing Magento 2 instance:
 
 ```bash
-$ cd /var/www/html/projectname
+$ cd /var/www/html/projectname/scripts
 $ ln -s /var/www/html/magento2-deployment/update update
 $ cp config.env.sample config.env
 ```

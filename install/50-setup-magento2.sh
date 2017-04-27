@@ -32,5 +32,5 @@ bin/magento $DEPLOY_COMMAND
 bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
 # Generate SASS
-cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-gulp styles --disableMaps --prod
+#cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
+#gulp styles --disableMaps --prod

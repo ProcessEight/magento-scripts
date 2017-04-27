@@ -6,6 +6,7 @@ set -a; . `pwd`/config.env
 cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
+rm -rf var/cache/mage-tags/*
 bin/magento cache:enable
 
 # We skip compilation here because we've already done in the previous step
@@ -20,7 +21,3 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]];
         crontab /tmp/magento2-crontab
         bin/magento setup:cron:run
 fi
-
-# Disable XDebug (if present)
-
-# Enable OPCache

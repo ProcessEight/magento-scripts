@@ -38,17 +38,17 @@
     copy:
       src: ../config.env
       dest: /root/config.env
-  - name: 1 prepare composer
+  - name: 1/7 prepare composer
     script: 10-prepare-composer.sh
-  - name: 2 prepare database
+  - name: 2/7 prepare database
     script: 20-prepare-database.sh
-  - name: 3 prepare magento 2
+  - name: 3/7 prepare magento 2
     script: 30-prepare-magento2.sh
-  - name: 4 install magento 2
+  - name: 4/7 install magento 2
     script: 40-install-magento2.sh
-  - name: 5 setup magento 2
+  - name: 5/7 setup magento 2
     script: 50-setup-magento2.sh
-  - name: 5 setup database
+  - name: 6/7 setup database
     script: 60-setup-database.sh
-  - name: 6 set production settings
+  - name: 7/7 set production settings
     script: 70-set-production-settings.sh
