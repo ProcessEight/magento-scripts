@@ -12,7 +12,20 @@ cd $MAGENTO2_ENV_WEBROOT
 
 echo "# Create a new, blank Magento 2 install"
 composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+composer require snowdog/frontools
+composer update
 
+#echo "# Install yarn for gulp"
+#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#sudo apt-get update && sudo apt-get install yarn
+cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
+rm -rf node_modules
+yarn install
+yarn add gulp-cli
+yarn add gulp
+
+cd $MAGENTO2_ENV_WEBROOT
 echo "# Make sure we can execute the CLI tool"
 chmod u+x bin/magento
 echo "# Force correct permissions on files"

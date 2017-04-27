@@ -32,10 +32,12 @@
       - php-common
       - composer
       - postfix
+      - yarn
+      - nodejs-legacy
   - name: copy config.env
     copy:
       src: ../config.env
-      dest: /tmp/config.env
+      dest: /root/config.env
   - name: 1 prepare composer
     script: 10-prepare-composer.sh
   - name: 2 prepare database
