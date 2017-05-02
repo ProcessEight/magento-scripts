@@ -2,7 +2,7 @@
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
-set -a; . `pwd`/config.env
+set -a; . `pwd`/config-m2.env
 
 mysql -u $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "create database $MAGENTO2_DB_NAME"
 mysql -u $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "create user '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' identified by '$MAGENTO2_DB_PASSWORD'"

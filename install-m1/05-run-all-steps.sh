@@ -37,6 +37,8 @@ echo "{
     }
 }" > $MAGENTO1_ENV_WEBROOT/composer.json
 
+cat $MAGENTO1_ENV_WEBROOT/composer.json
+
 # Composer parallel install plugin
 composer global require hirak/prestissimo
 
@@ -132,20 +134,13 @@ echo "
 "
 
 # Prepare database
-if [[ $MAGENTO1_DB_BACKUPFIRST == "true" ]]; then
-    mysqldump -u root --password=password $MAGENTO1_DB_NAME > $MAGENTO1_DB_NAME.bak.sql
-fi
-
-# If database dump exists, then import it
-if [[ -f $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql || $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
-    if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == "true" ]]; then
-        mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < /var/www/html/magento2-deployment/resources/sample-data-$MAGENTO1_ENV_VERSION/magento_sample_data_for_$MAGENTO1_ENV_VERSION.sql
-    else
-        mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql
-    fi
+mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
+mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
+mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
+if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == "true" ]]; then
+    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < sample-data.sql
+else
+    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_DB_NAME.bak.sql
 fi
 
 echo "
@@ -155,8 +150,7 @@ echo "
 "
 
 # Install n98-magerun
-if [[ ! -f n98-magerun.phar ]]; then
-    cd $MAGENTO1_ENV_WEBROOT
+if [[ ! -f ./n98-magerun.phar ]]; then
     wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
 fi
 
@@ -166,22 +160,13 @@ echo "
 #
 "
 
-# Install Kalen Jordans' MageRun Addons (for customer data sterilisation)
+# Install Kalen Jordans' MageRun Addons (for customer sterilisation)
 if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
     mkdir -p ~/.n98-magerun/modules/
     cd ~/.n98-magerun/modules/
     git clone git@github.com:kalenjordan/magerun-addons.git
-    cd $MAGENTO1_ENV_WEBROOT
 fi
 
-echo "
-#
-# Extract media folder backup and move into place (if it exists)
-#
-"
-if [[ -f $MAGENTO1_ENV_WEBROOT/media.bak.tar.gz ]]; then
-    tar -xzf media.bak.tar.gz media
-fi
 
 echo "
 #
@@ -190,26 +175,19 @@ echo "
 "
 
 # Force correct permissions on files
-find var vendor media app/etc -type f -exec chmod u+w {} \;
+find vendor media app/etc -type f -exec chmod u+w {} \;
 # Force correct permissions on directories
-find var vendor media app/etc -type d -exec chmod u+w {} \;
+find vendor media app/etc -type d -exec chmod u+w {} \;
 # Force correct ownership on files
-#find var vendor media app/etc -type f -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
+#find vendor media app/etc -type f -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
 # Force correct ownership on directories
-#find var vendor media app/etc -type d -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
+#find vendor media app/etc -type d -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
 # Set the sticky bit to ensure that files are generated with the right ownership
-find var vendor media app/etc -type d -exec chmod g+s {} \;
+find vendor media app/etc -type d -exec chmod g+s {} \;
 
 # Install frontend tools
 
-# This script assumes the tools needed to compile SASS to CSS are already installed
-# If not however, they can be installed using the following commands
-#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-#sudo apt-get update && sudo apt-get install yarn
-#cd "$MAGENTO1_ENV_WEBROOT/$MAGENTO1_ENV_SKINDIRECTORY"
-#rm -rf node_modules
-#yarn
+# git pull
 
 echo "
 #
@@ -220,7 +198,7 @@ echo "
 # Clear cache
 ./n98-magerun.phar cache:clean
 ./n98-magerun.phar cache:flush
-
+exit
 echo "
 #
 # Generate CSS
@@ -228,9 +206,7 @@ echo "
 "
 
 # Generate CSS
-cd "$MAGENTO1_ENV_WEBROOT/$MAGENTO1_ENV_SKINDIRECTORY"
-gulp build:production --disableMaps --prod
-cd $MAGENTO1_ENV_WEBROOT
+gulp styles --disableMaps --prod
 
 echo "
 #
@@ -259,6 +235,8 @@ echo "
 # Disable maintenance mode
 ./n98-magerun.phar sys:maintenance
 
+# Enable developer mode (for local environments)
+
 echo "
 #
 # Enable display_errors
@@ -267,6 +245,8 @@ echo "
 
 # Enable display_errors
 sed -i -e "s/#ini_set('display_errors', 1);/ini_set('display_errors', 1);/g" index.php
+
+cat $MAGENTO1_ENV_WEBROOT/index.php
 
 echo "
 #

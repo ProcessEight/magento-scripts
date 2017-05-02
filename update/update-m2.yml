@@ -4,17 +4,17 @@
 # Readme:
 #   1. Add the hosts you want to run this Playbook on to Ansible:
 #     $ nano /etc/ansible/hosts
-#   2. Update the config.env file to add platform-specific values
+#   2. Update the config-m2.env file to add platform-specific values
 #   3. Run this command to update Magento 2:
 #     $ ansible-playbook m2.yml
 #
 ---
 - hosts: m2
   tasks:
-  - name: copy config.env
+  - name: copy config-m2.env
     copy:
-      src: ../config.env
-      dest: /root/config.env
+      src: ../config-m2.env
+      dest: /root/config-m2.env
   - name: 1/7 prepare composer
     script: 10-prepare-composer.sh
   - name: 2/7 prepare database

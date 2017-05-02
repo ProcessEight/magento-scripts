@@ -14,10 +14,10 @@ To use the scripts to install a new Magento 2 instance:
 $ mkdir projectname
 $ cd projectname
 $ ln -s /var/www/html/magento2-deployment/install install
-$ cp config.env.sample config.env
+$ cp config-m2.env.sample config-m2.env
 ```
 
-Now update the `config.env` file, then:
+Now update the `config-m2.env` file, then:
 
 ```bash
 $ cd /var/www/html/projectname
@@ -31,10 +31,10 @@ To use the scripts to update an existing Magento 2 instance:
 ```bash
 $ cd /var/www/html/projectname/scripts
 $ ln -s /var/www/html/magento2-deployment/update update
-$ cp config.env.sample config.env
+$ cp config-m2.env.sample config-m2.env
 ```
 
-Now update the `config.env` file, then:
+Now update the `config-m2.env` file, then:
 
 ```bash
 $ cd /var/www/html/projectname
@@ -50,9 +50,9 @@ Add the hosts you want to run this Playbook on to Ansible:
 $ nano /etc/ansible/hosts
 ```
 
-Update the config.env file to add platform-specific values
+Update the config-m2.env file to add platform-specific values
 ```bash
-cp config.env.sample config.env
+cp config-m2.env.sample config-m2.env
 ```
 
 Run this command to install Magento 2:
@@ -69,9 +69,9 @@ Add the hosts you want to run this Playbook on to Ansible:
 $ nano /etc/ansible/hosts
 ```
 
-Update the config.env file to add platform-specific values
+Update the config-m2.env file to add platform-specific values
 ```bash
-cp config.env.sample config.env
+cp config-m2.env.sample config-m2.env
 ```
 
 Run this command to install Magento 2:
