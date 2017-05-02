@@ -11,6 +11,14 @@ echo "
 #
 "
 
+COMPOSER_CMD=$(which composer)
+if [[ "" == "$COMPOSER_CMD" ]]
+then
+    wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer --install-dir=/usr/local/bin
+fi
+
+mkdir -p ~/.composer/
+
 if [[ $MAGENTO1_ENV_VERSION < 1.9.2.4 ]]; then
     export INCHOOPHP7_BRANCH=1.9.2.4-dev;
     export SAMPLEDATA_VERSION=1.9.1.0
@@ -122,7 +130,7 @@ if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/local.xml ]]; then
 " >> $MAGENTO1_ENV_WEBROOT/app/etc/local.xml.template
     fi
 
-    ./n98-magerun.phar local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
+    ./n98-magerun.phar --skip-root-check local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
 fi
 
 echo "
@@ -170,7 +178,7 @@ echo "
 if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
     mkdir -p ~/.n98-magerun/modules/
     cd ~/.n98-magerun/modules/
-    git clone git@github.com:kalenjordan/magerun-addons.git
+    git clone https://github.com/kalenjordan/magerun-addons.git
     cd $MAGENTO1_ENV_WEBROOT
 fi
 
@@ -204,6 +212,15 @@ find var vendor media app/etc -type d -exec chmod g+s {} \;
 
 # This script assumes the tools needed to compile SASS to CSS are already installed
 # If not however, they can be installed using the following commands
+# Install Node JS
+# sudo apt-get install build-essential libssl-dev
+# curl -sL https://raw.githubusercontent.com/creationix/nvm/v0.31.0/install.sh -o install_nvm.sh
+# ./install_nvm.sh
+# source ~/.profile
+# nvm install 7.9.0
+# npm install gulp-cli -g
+# npm install gulp -D
+# Install Yarn
 #curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 #echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 #sudo apt-get update && sudo apt-get install yarn
@@ -218,8 +235,8 @@ echo "
 "
 
 # Clear cache
-./n98-magerun.phar cache:clean
-./n98-magerun.phar cache:flush
+./n98-magerun.phar --skip-root-check cache:clean
+./n98-magerun.phar --skip-root-check cache:flush
 
 echo "
 #
@@ -239,7 +256,7 @@ echo "
 "
 
 # Enable maintenance mode
-./n98-magerun.phar sys:maintenance
+./n98-magerun.phar --skip-root-check sys:maintenance
 
 echo "
 #
@@ -248,7 +265,7 @@ echo "
 "
 
 # Run database upgrades
-./n98-magerun.phar sys:setup:run
+./n98-magerun.phar --skip-root-check sys:setup:run
 
 echo "
 #
@@ -257,7 +274,7 @@ echo "
 "
 
 # Disable maintenance mode
-./n98-magerun.phar sys:maintenance
+./n98-magerun.phar --skip-root-check sys:maintenance
 
 echo "
 #
@@ -275,8 +292,8 @@ echo "
 "
 
 # Create new admin user
-./n98-magerun.phar admin:user:delete $MAGENTO1_ADMIN_USERNAME
-./n98-magerun.phar admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
+./n98-magerun.phar --skip-root-check admin:user:delete $MAGENTO1_ADMIN_USERNAME
+./n98-magerun.phar --skip-root-check admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
 
 echo "
 #
@@ -287,7 +304,7 @@ echo "
 # Create dummy customer with dummy addresses
 
 # Sterilise customer data
-./n98-magerun.phar customer:anon
+./n98-magerun.phar --skip-root-check customer:anon
 
 
 echo "
