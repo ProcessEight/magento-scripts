@@ -45,6 +45,8 @@ fi
 # Composer parallel install plugin
 composer global require hirak/prestissimo
 
+cd $MAGENTO2_ENV_WEBROOT
+
 # Install the project
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
