@@ -14,6 +14,8 @@ export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
+
 bin/magento $DEPLOY_COMMAND
+
 # Generate static assets for Admin theme
 bin/magento setup:static-content:deploy en_US --theme Magento/backend

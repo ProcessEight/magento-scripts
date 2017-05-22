@@ -11,11 +11,12 @@ cd $MAGENTO2_ENV_WEBROOT
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
-#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
-#    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-#fi
-echo $DEPLOY_COMMAND
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
+    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
+fi
+#echo $DEPLOY_COMMAND
 bin/magento $DEPLOY_COMMAND
+
 # Generate static assets for Admin theme
 bin/magento setup:static-content:deploy en_US --theme Magento/backend
 

@@ -13,7 +13,7 @@ cd $MAGENTO2_ENV_WEBROOT
 echo "# Create a new, blank Magento 2 install"
 composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
 composer require snowdog/frontools
-composer update
+composer install
 
 #echo "# Install yarn for gulp"
 #curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
