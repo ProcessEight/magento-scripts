@@ -3,7 +3,7 @@
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config.env
-cd $MAGENTO1_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT
 
 echo "
 #
@@ -82,7 +82,7 @@ echo "
 #
 "
 
-cd $MAGENTO1_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT
 # Code generation
 
 # Force clean old files first. Don't rely on Magento 2.
@@ -126,7 +126,7 @@ echo "
 # 60. Update database schema and data
 #
 "
-cd $MAGENTO1_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
 bin/magento maintenance:enable
