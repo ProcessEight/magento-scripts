@@ -19,3 +19,7 @@ bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin theme
 bin/magento setup:static-content:deploy en_US --theme Magento/backend
+
+# Generate SASS
+cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
+gulp styles --disableMaps --prod
