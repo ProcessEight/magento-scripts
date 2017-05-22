@@ -14,7 +14,7 @@ To use the scripts to install a new Magento 2 instance:
 $ mkdir projectname
 $ cd projectname
 $ ln -s /var/www/html/magento2-deployment/install install
-$ cp config-m2.env.sample config-m2.env
+$ cp /var/www/html/magento2-deployment/config-m2.env.sample config-m2.env
 ```
 
 Now update the `config-m2.env` file, then:
@@ -31,7 +31,7 @@ To use the scripts to update an existing Magento 2 instance:
 ```bash
 $ cd /var/www/html/projectname/scripts
 $ ln -s /var/www/html/magento2-deployment/update update
-$ cp config-m2.env.sample config-m2.env
+$ cp /var/www/html/magento2-deployment/config-m2.env.sample config-m2.env
 ```
 
 Now update the `config-m2.env` file, then:

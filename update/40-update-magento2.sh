@@ -12,4 +12,6 @@ composer global require hirak/prestissimo
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
 
+# Make sure we can execute the CLI tool
+chmod u+x bin/magento
 bin/magento module:enable --all
