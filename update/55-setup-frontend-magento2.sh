@@ -10,7 +10,7 @@ cd $MAGENTO2_ENV_WEBROOT
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
- Exclude configured themes
+# Exclude configured themes
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
