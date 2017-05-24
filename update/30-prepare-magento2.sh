@@ -17,11 +17,3 @@ find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_C
 find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 # Set the sticky bit to ensure that files are generated with the right ownership
 find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
-
-# This script assumes the tools needed to compile SASS to CSS are already installed
-# If not however, they can be installed using the following commands
-#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-#sudo apt-get update && sudo apt-get install yarn
-cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-yarn install
