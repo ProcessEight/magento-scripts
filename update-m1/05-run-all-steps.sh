@@ -54,6 +54,32 @@ composer install
 
 echo "
 #
+# Install magerun
+#
+"
+
+# Install n98-magerun
+if [[ ! -f n98-magerun.phar ]]; then
+    cd $MAGENTO1_ENV_WEBROOT
+    wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
+fi
+
+echo "
+#
+# Install magerun-addons
+#
+"
+
+# Install Kalen Jordans' MageRun Addons (for customer data sterilisation)
+if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
+    mkdir -p ~/.n98-magerun/modules/
+    cd ~/.n98-magerun/modules/
+    git clone https://github.com/kalenjordan/magerun-addons.git
+    cd $MAGENTO1_ENV_WEBROOT
+fi
+
+echo "
+#
 # Create local.xml (if it doesn't already exist)
 #
 "
@@ -154,32 +180,6 @@ if [[ -f $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql || $MAGENTO1_ENV_IN
     else
         mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql
     fi
-fi
-
-echo "
-#
-# Install magerun
-#
-"
-
-# Install n98-magerun
-if [[ ! -f n98-magerun.phar ]]; then
-    cd $MAGENTO1_ENV_WEBROOT
-    wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
-fi
-
-echo "
-#
-# Install magerun-addons
-#
-"
-
-# Install Kalen Jordans' MageRun Addons (for customer data sterilisation)
-if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
-    mkdir -p ~/.n98-magerun/modules/
-    cd ~/.n98-magerun/modules/
-    git clone https://github.com/kalenjordan/magerun-addons.git
-    cd $MAGENTO1_ENV_WEBROOT
 fi
 
 echo "
