@@ -11,14 +11,13 @@
 # Custom script:        See below
 #
 
-# Code generation
+php -f bin/magento deploy:mode:set developer
 
-# These modules are broken (temporary fix)
+# These modules break code generation (temporary fix)
 # TODO: Move module:disable command into an env variable
-php -f bin/magento module:disable AudereCommerce_KamarinEcommerceLink AudereCommerce_AccountsIntegration
+php -f bin/magento module:disable AudereCommerce_KamarinEcommerceLink Purenet_Setup
 
-#echo "Skipping code generation"
-
+# Code generation
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/*
 if [[ %env.MAGENTO2_ENV_MULTITENANT% == "true" ]];

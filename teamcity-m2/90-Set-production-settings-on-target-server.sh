@@ -15,9 +15,10 @@ ssh administrator@%env.MAGENTO2_ENV_HOSTNAME% << EOF
 cd %env.MAGENTO2_ENV_WEBROOT%
 
 # Enable all caches
-php -f bin/magento cache:enable
+sudo -u administrator php -f bin/magento cache:flush
+sudo -u administrator php -f bin/magento cache:enable
 
 # We skip compilation here because we've already done that in the previous step
-php -f bin/magento deploy:mode:set production --skip-compilation
+sudo -u administrator php -f bin/magento deploy:mode:set production --skip-compilation
 
 EOF

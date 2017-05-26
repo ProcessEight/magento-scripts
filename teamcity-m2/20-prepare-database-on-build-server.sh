@@ -11,14 +11,14 @@
 # Custom script:        See below
 #
 
-MYSQL_COMMAND=$(which mysql)
-if [[ "" == "$DOES_DB_EXIST" ]]; then
-    # TODO: Implement that bit about debconf-set-selections to inject the root password when it asks for it
-    wget https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
-    sudo dpkg -i percona-release_0.1-4.$(lsb_release -sc)_all.deb
-    sudo apt-get update
-    sudo apt-get install percona-server-server-5.7
-fi;
+#MYSQL_COMMAND=$(which mysql)
+#if [[ "" == "$MYSQL_COMMAND" ]]; then
+#    # TODO: Implement that bit about debconf-set-selections to inject the root password when it asks for it
+#    wget https://repo.percona.com/apt/percona-release_0.1-4.$(lsb_release -sc)_all.deb
+#    sudo dpkg -i percona-release_0.1-4.$(lsb_release -sc)_all.deb
+#    sudo apt-get update
+#    sudo apt-get install percona-server-server-5.7
+#fi;
 
 #echo "create database %env.MAGENTO2_DB_NAME%"
 mysql -u root --password=password123 -e "create database %env.MAGENTO2_DB_NAME%"

@@ -15,17 +15,12 @@
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
 rm -rf pub/static/*
+
 export DEPLOY_COMMAND="setup:static-content:deploy %env.MAGENTO2_LOCALE_CODE%"
-
-echo "TEAMCITY MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE: %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE%"
-
 # Exclude configured themes
-#if [[ %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE% == "true" ]]; then
+if [[ %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE% == true ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES%"
-#fi
-
-# Debugging
-echo "DEPLOY_COMMAND: $DEPLOY_COMMAND"
+fi
 
 php -f bin/magento $DEPLOY_COMMAND
 
