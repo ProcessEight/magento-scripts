@@ -10,6 +10,7 @@ echo "
 # 10. Prepare composer
 #
 "
+
 COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]
 then
@@ -26,6 +27,7 @@ echo "{
       }
    }
 }" > ~/.composer/auth.json
+
 
 echo "
 #
@@ -49,6 +51,10 @@ composer global require hirak/prestissimo
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
 
+# Make sure we can execute the CLI tool
+chmod u+x bin/magento
+bin/magento module:enable --all
+
 echo "
 #
 # 30. Set permissions and ownership; Install frontend tools
@@ -65,8 +71,8 @@ find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
 find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 # Force correct ownership on directories
 find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Set the sticky bit to ensure that files are generated with the right ownership
-find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+# Set the group-id bit to ensure that files and directories are generated with the right ownership
+find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
 # This script assumes the tools needed to compile SASS to CSS are already installed
 # If not however, they can be installed using the following commands
@@ -110,16 +116,21 @@ export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
-#echo $DEPLOY_COMMAND
 bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin theme
 bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
-# Generate SASS
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-gulp styles --disableMaps --prod
 
+#echo "# Install yarn for gulp"
+#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+#sudo apt-get update && sudo apt-get install yarn
+yarn install
+
+# Generate SASS
+gulp styles --disableMaps --prod
 
 echo "
 #

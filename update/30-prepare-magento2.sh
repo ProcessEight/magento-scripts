@@ -15,5 +15,5 @@ find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
 find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 # Force correct ownership on directories
 find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Set the sticky bit to ensure that files are generated with the right ownership
-find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+# Set the group-id bit to ensure that files and directories are generated with the right ownership
+find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
