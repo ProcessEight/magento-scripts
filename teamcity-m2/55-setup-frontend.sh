@@ -22,10 +22,12 @@ if [[ %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE% == true ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND %env.MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES%"
 fi
 
+echo $DEPLOY_COMMAND
 php -f bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin theme
-php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
+# @todo Add the themes to the config-m2.env file
+php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
 
 # Generate SASS
 cd vendor/snowdog/frontools

@@ -45,9 +45,6 @@ echo "{
     }
 }" > $MAGENTO1_ENV_WEBROOT/composer.json
 
-# Composer parallel install plugin
-composer global require hirak/prestissimo
-
 # Install the project
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
@@ -172,13 +169,13 @@ fi
 
 # If database dump exists, then import it
 if [[ -f $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql || $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
-    mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
+    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
+    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
+    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
     if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == "true" ]]; then
-        mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < /var/www/html/magento2-deployment/resources/sample-data-$MAGENTO1_ENV_VERSION/magento_sample_data_for_$MAGENTO1_ENV_VERSION.sql
+        mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < /var/www/html/magento2-deployment/resources/sample-data-$MAGENTO1_ENV_VERSION/magento_sample_data_for_$MAGENTO1_ENV_VERSION.sql
     else
-        mysql -u $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql
+        mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/var/$MAGENTO1_DB_NAME.bak.sql
     fi
 fi
 

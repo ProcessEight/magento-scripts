@@ -35,29 +35,28 @@ echo "
 #
 "
 
-if [[ $MAGENTO2_DB_BACKUPFIRST == "true" ]];
-then mysqldump -u root --password=password $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
+if [[ $MAGENTO2_DB_BACKUPFIRST == "true" ]]; then
+mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 
-# Install n98-magerun2
-if [[ ! -f ./n98-magerun2.phar ]]; then
-    wget https://files.magerun.net/n98-magerun2.phar && chmod +x ./n98-magerun2.phar
+if [[ $MAGENTO2_DB_IMPORT == true ]]; then
+echo "# Remove existing database"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME"
+echo "# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step"
+echo "# This prevents MySQL from issuing and error if the user does not exist"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+echo "# Create new database and user"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE DATABASE $MAGENTO2_DB_NAME"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+echo "# Importing database dump"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME < $MAGENTO2_DB_DUMPNAME
 fi
-
-# Composer parallel install plugin
-composer global require hirak/prestissimo
-
-# Install the project
-# Reads the composer.lock file and installs/updates all dependencies to the specified version
-composer install
-
-# Make sure we can execute the CLI tool
-chmod u+x bin/magento
-bin/magento module:enable --all
 
 echo "
 #
-# 30. Set permissions and ownership; Install frontend tools
+# 30. Set permissions and ownership
 #
 "
 
@@ -74,13 +73,20 @@ find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_C
 # Set the group-id bit to ensure that files and directories are generated with the right ownership
 find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
-# This script assumes the tools needed to compile SASS to CSS are already installed
-# If not however, they can be installed using the following commands
-#curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
-#echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
-#sudo apt-get update && sudo apt-get install yarn
-cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-yarn install
+# Install the project
+# Reads the composer.lock file and installs/updates all dependencies to the specified version
+composer install
+
+# Make sure we can execute the CLI tool
+chmod u+x bin/magento
+php -f bin/magento module:enable --all
+
+php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
+--db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
+--admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
+--admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
+--currency=$MAGENTO2_LOCALE_CURRENCY --timezone=$MAGENTO2_LOCALE_TIMEZONE --use-rewrites=$MAGENTO2_CONFIG_REWRITES --backend-frontname=$MAGENTO2_ADMIN_FRONTNAME --admin-use-security-key=$MAGENTO2_CONFIG_SECURITYKEY \
+--session-save=$MAGENTO2_ENV_SESSIONSAVE $MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE
 
 echo "
 #
@@ -96,9 +102,9 @@ rm -rf var/generation/* var/di/*
 if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
 # For multisites running Magento 2.0.x only
 then
-    bin/magento setup:di:compile-multi-tenant
+    php -f bin/magento setup:di:compile-multi-tenant
 else
-    bin/magento setup:di:compile
+    php -f bin/magento setup:di:compile
 fi
 
 echo "
@@ -116,12 +122,13 @@ export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
-bin/magento $DEPLOY_COMMAND
+php -f bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin theme
-bin/magento setup:static-content:deploy en_US --theme Magento/backend
+php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend Purenet/backend
 
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
+
 
 #echo "# Install yarn for gulp"
 #curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -140,15 +147,20 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
-bin/magento maintenance:enable
+php -f bin/magento maintenance:enable
 
 # Don't remove the files we just generated
-bin/magento setup:upgrade --keep-generated
-bin/magento setup:db-schema:upgrade
-bin/magento setup:db-data:upgrade
+php -f bin/magento setup:upgrade --keep-generated
+php -f bin/magento setup:db-schema:upgrade
+php -f bin/magento setup:db-data:upgrade
 
 # Allow access to site again
-bin/magento maintenance:disable
+php -f bin/magento maintenance:disable
+
+# Install n98-magerun2
+#if [[ ! -f ./n98-magerun2.phar ]]; then
+#    wget https://files.magerun.net/n98-magerun2.phar && chmod +x ./n98-magerun2.phar
+#fi
 
 echo "
 #
@@ -157,10 +169,10 @@ echo "
 "
 
 # Enable all caches
-bin/magento cache:enable
+php -f bin/magento cache:enable
 
 # We skip compilation here because we've already done in the previous step
-bin/magento deploy:mode:set production --skip-compilation
+php -f bin/magento deploy:mode:set production --skip-compilation
 
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]];
@@ -169,5 +181,5 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]];
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
         crontab /tmp/magento2-crontab
-        bin/magento setup:cron:run
+        php -f bin/magento setup:cron:run
 fi

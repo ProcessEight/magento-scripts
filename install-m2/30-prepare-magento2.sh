@@ -4,9 +4,6 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config-m2.env
 
-# Composer parallel install plugin
-composer global require hirak/prestissimo
-
 mkdir -p $MAGENTO2_ENV_WEBROOT
 cd $MAGENTO2_ENV_WEBROOT
 
