@@ -125,7 +125,7 @@ fi
 php -f bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin theme
-php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend Purenet/backend
+php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
 
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
 
