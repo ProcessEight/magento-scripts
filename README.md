@@ -22,6 +22,8 @@ Let's begin.
 1. Create a sym-link to the `magento2-deployment` scripts:
     ```bash
     $ cd englishbraids.test.dev
+    $ mkdir scripts
+    $ cd scripts
     $ ln -s /var/www/html/magento2-deployment/update-m2 update-m2
     ```
 1. Now create a environment variable file called `config-m2.env`. You can copy the sample one from the `magento-deployment` repo:
@@ -56,9 +58,20 @@ Warning: Invalid argument supplied for foreach() in /var/www/html/englishbraids.
 Magento 2 is not installed, or is not installed correctly. Magento 2 needs to be installed to generate static content.
 
 ```bash
-There are no commands defined in the "cache" namespace.  
+There are no commands defined in tapp/design/frontend/florenceroby/default/template/checkout/cart.phtml: This logic should really be moved into a block class. There's also a typo in collegKitInBasket.
+he "cache" namespace.  
 ```
 This can happen with any command, not just commands in the `cache` namespace. Magento 2 has hit upon an internal error, usually when loading the configuration. Clear the `var/generation`, `var/di` and cache folders and try running the command again.
+
+```bash
+Could not scan for classes inside "/var/www/html/englishbraids.test/htdocs/vendor/colinmollenhour/cache-backend-redis/Cm/Cache/Backend/Redis.php" which does not appear to be a file nor a folder  
+```
+The composer cache is corrupt. Clean it using:
+```bash
+$ composer cache-clean
+$ rm -rf htdocs/composer.lock htdocs/vendor/
+```
+The re-run the `composer install` command.
 
 ## Install locally
 

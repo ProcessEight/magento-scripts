@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-set -a; . `pwd`/config-m2.env
+set -a; . `pwd`/config-m1.env
 
 # Cleanup
-sudo rm -f /etc/nginx/sites-enabled/$MAGENTO2_ENV_HOSTNAME
-sudo rm -f /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME
+sudo rm -f /etc/nginx/sites-enabled/$MAGENTO1_ENV_HOSTNAME
+sudo rm -f /etc/nginx/sites-available/$MAGENTO1_ENV_HOSTNAME
 
 sudo echo "# Uncomment this if you don't already have a fastcgi_backend defined
 #upstream fastcgi_backend {
@@ -12,8 +12,8 @@ sudo echo "# Uncomment this if you don't already have a fastcgi_backend defined
 
 server {
     listen 80;
-    server_name $MAGENTO2_ENV_HOSTNAME;
-    root $MAGENTO2_ENV_WEBROOT;
+    server_name $MAGENTO1_ENV_HOSTNAME www.$MAGENTO1_ENV_HOSTNAME;
+    root $MAGENTO1_ENV_WEBROOT;
 
     # Important for VirtualBox
     sendfile off;
@@ -64,10 +64,10 @@ server {
         include                 fastcgi_params;
     }
 }
-" >> /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME
+" >> /etc/nginx/sites-available/$MAGENTO1_ENV_HOSTNAME
 
-sudo ln -s /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/$MAGENTO1_ENV_HOSTNAME /etc/nginx/sites-enabled/
 
-sudo echo "127.0.0.1       $MAGENTO2_ENV_HOSTNAME" >> /etc/hosts
+sudo echo "127.0.0.1       $MAGENTO1_ENV_HOSTNAME www.$MAGENTO1_ENV_HOSTNAME" >> /etc/hosts
 
 sudo service nginx restart

@@ -77,8 +77,6 @@ find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
 
-# Make sure we can execute the CLI tool
-chmod u+x bin/magento
 php -f bin/magento module:enable --all
 
 php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
