@@ -138,8 +138,8 @@ Composer-specific settings
 
 | Variable name  	| Default value  	| Description  	| Sample value  	|
 |---	|---	|---	|---	|
-| MAGENTO2_PUBLIC_KEY    	| Empty  	| The public key from your Magento.com account  	| a1b2c3c2830848acb86e59092f62ef8d  	|
-| MAGENTO2_PRIVATE_KEY  	| Empty  	| The private key from your Magento.com account  	| b3674905a16e118b428893c7c43c2b1a  	|
+| MAGENTO2_PUBLIC_KEY    	| Empty  	| The public key from your Magento.com account  	| `a1b2c3c2830848acb86e59092f62ef8d`	|
+| MAGENTO2_PRIVATE_KEY  	| Empty  	| The private key from your Magento.com account  	| `b3674905a16e118b428893c7c43c2b1a`  	|
 
 ### Database
 Database management settings
