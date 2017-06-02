@@ -146,7 +146,7 @@ Database management settings
 
 | Variable name  	| Default value  	| Description  	| Sample value  	|
 |---	|---	|---	|---	|
-MAGENTO2_DB_HOSTNAME
+MAGENTO2_DB_HOSTNAME | None | The hostname of the server MySQL is running on. Usually localhost. | `localhost` |
 MAGENTO2_DB_ROOTUSERNAME "--user=root"
 MAGENTO2_DB_ROOTPASSWORD "--password=password"
 MAGENTO2_DB_NAME
