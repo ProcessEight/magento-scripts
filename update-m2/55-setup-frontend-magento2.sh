@@ -10,13 +10,16 @@ cd $MAGENTO2_ENV_WEBROOT
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
+
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
-bin/magento $DEPLOY_COMMAND
 
-# Generate static assets for Admin theme
+# Generate static assets for configured themes
+php -f bin/magento $DEPLOY_COMMAND
+
+# Generate static assets for Admin themes
 php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
 
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools

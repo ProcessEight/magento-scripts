@@ -5,13 +5,13 @@
 set -a; . `pwd`/config-m2.env
 cd $MAGENTO2_ENV_WEBROOT
 
-# Remove customer access to site (whitelisted IPs can still access frontend/backend)
-bin/magento maintenance:enable
+# Disable customer access to site (whitelisted IPs can still access frontend/backend)
+php -f bin/magento maintenance:enable
 
 # Don't remove the files we just generated
-bin/magento setup:upgrade --keep-generated
-bin/magento setup:db-schema:upgrade
-bin/magento setup:db-data:upgrade
+php -f bin/magento setup:upgrade --keep-generated
+php -f bin/magento setup:db-schema:upgrade
+php -f bin/magento setup:db-data:upgrade
 
 # Allow access to site again
-bin/magento maintenance:disable
+php -f bin/magento maintenance:disable

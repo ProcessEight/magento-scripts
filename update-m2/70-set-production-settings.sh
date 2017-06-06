@@ -6,10 +6,10 @@ set -a; . `pwd`/config-m2.env
 cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
-bin/magento cache:enable
+php -f bin/magento cache:enable
 
 # We skip compilation here because we've already done in the previous step
-bin/magento deploy:mode:set production --skip-compilation
+php -f bin/magento deploy:mode:set production --skip-compilation
 
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]];
@@ -18,9 +18,5 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]];
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
         crontab /tmp/magento2-crontab
-        bin/magento setup:cron:run
+        php -f bin/magento setup:cron:run
 fi
-
-#phpdismod xdebug
-#phpenmod opcache
-#service php7.0-fpm restart

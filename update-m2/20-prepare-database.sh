@@ -4,7 +4,7 @@
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config-m2.env
 
-if [[ $MAGENTO2_DB_BACKUPFIRST == "true" ]]; then
+if [[ $MAGENTO2_DB_BACKUPFIRST == true ]]; then
 mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 

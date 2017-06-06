@@ -3,13 +3,13 @@
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
 set -a; . `pwd`/config-m2.env
-cd $MAGENTO2_ENV_WEBROOT
 
 echo "
 #
 # 10. Prepare composer
 #
 "
+cd $MAGENTO2_ENV_WEBROOT
 
 COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]
@@ -34,8 +34,9 @@ echo "
 # 20. Prepare database
 #
 "
+cd $MAGENTO2_ENV_WEBROOT
 
-if [[ $MAGENTO2_DB_BACKUPFIRST == "true" ]]; then
+if [[ $MAGENTO2_DB_BACKUPFIRST == true ]]; then
 mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 
@@ -59,6 +60,7 @@ echo "
 # 30. Set permissions and ownership
 #
 "
+cd $MAGENTO2_ENV_WEBROOT
 
 # Make sure we can execute the CLI tool
 chmod u+x bin/magento
@@ -73,12 +75,22 @@ find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_C
 # Set the group-id bit to ensure that files and directories are generated with the right ownership
 find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
+echo "
+#
+# 40. Update Magento 2
+#
+"
+cd $MAGENTO2_ENV_WEBROOT
+
 # Install the project
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
 
+# Make sure we can execute the CLI tool
+chmod u+x bin/magento
 php -f bin/magento module:enable --all
 
+# Ensure the application is installed (especially if we re-imported the database)
 php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
 --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
@@ -91,18 +103,17 @@ echo "
 # 50. Code generation
 #
 "
-
 cd $MAGENTO2_ENV_WEBROOT
 # Code generation
 
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/*
-if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 # For multisites running Magento 2.0.x only
 then
-    php -f bin/magento setup:di:compile-multi-tenant
+    bin/magento setup:di:compile-multi-tenant
 else
-    php -f bin/magento setup:di:compile
+    bin/magento setup:di:compile
 fi
 
 echo "
@@ -110,23 +121,26 @@ echo "
 # 55. Static content generation
 #
 "
+cd $MAGENTO2_ENV_WEBROOT
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
+
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == "true" ]]; then
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
     DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
+
+# Generate static assets for configured themes
 php -f bin/magento $DEPLOY_COMMAND
 
-# Generate static assets for Admin theme
+# Generate static assets for Admin themes
 php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
 
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-
 
 #echo "# Install yarn for gulp"
 #curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
@@ -144,7 +158,7 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-# Remove customer access to site (whitelisted IPs can still access frontend/backend)
+# Disable customer access to site (whitelisted IPs can still access frontend/backend)
 php -f bin/magento maintenance:enable
 
 # Don't remove the files we just generated
@@ -156,15 +170,17 @@ php -f bin/magento setup:db-data:upgrade
 php -f bin/magento maintenance:disable
 
 # Install n98-magerun2
-#if [[ ! -f ./n98-magerun2.phar ]]; then
-#    wget https://files.magerun.net/n98-magerun2.phar && chmod +x ./n98-magerun2.phar
-#fi
+if [[ ! -f ./n98-magerun2.phar ]]; then
+    wget https://files.magerun.net/n98-magerun2.phar && chmod +x ./n98-magerun2.phar
+fi
 
 echo "
 #
 # 70. Set production settings
 #
 "
+
+cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
 php -f bin/magento cache:enable

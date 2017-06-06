@@ -9,7 +9,7 @@ cd $MAGENTO2_ENV_WEBROOT
 
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/*
-if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 # For multisites running Magento 2.0.x only
 then
     bin/magento setup:di:compile-multi-tenant
