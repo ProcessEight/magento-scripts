@@ -1,7 +1,9 @@
 # Magento 2 Deployment
 
 ## Setup a new instance of an existing project
+
 This guide assumes that you have:
+
 * A database dump from an existing instance of the project
 * Access to the project git repo
 * A cloned copy of the magento2-deployment repo, checked out in another directory
@@ -136,15 +138,15 @@ Composer-specific settings
 
 | Variable name  	| Default value  	| Description  	| Sample value  	|
 |---	|---	|---	|---	|
-| MAGENTO2_PUBLIC_KEY    	| Empty  	| The public key from your Magento.com account  	|   	|
-| MAGENTO2_PRIVATE_KEY  	| Empty  	| The private key from your Magento.com account  	|   	|
+| MAGENTO2_PUBLIC_KEY    	| Empty  	| The public key from your Magento.com account  	| `a1b2c3c2830848acb86e59092f62ef8d`	|
+| MAGENTO2_PRIVATE_KEY  	| Empty  	| The private key from your Magento.com account  	| `b3674905a16e118b428893c7c43c2b1a`  	|
 
 ### Database
 Database management settings
 
 | Variable name  	| Default value  	| Description  	| Sample value  	|
 |---	|---	|---	|---	|
-MAGENTO2_DB_HOSTNAME
+MAGENTO2_DB_HOSTNAME | None | The hostname of the server MySQL is running on. Usually localhost. | `localhost` |
 MAGENTO2_DB_ROOTUSERNAME "--user=root"
 MAGENTO2_DB_ROOTPASSWORD "--password=password"
 MAGENTO2_DB_NAME
