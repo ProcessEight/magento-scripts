@@ -45,6 +45,31 @@ composer install
 
 echo "
 #
+# Install magerun
+#
+"
+
+# Install n98-magerun
+if [[ ! -f ./n98-magerun.phar ]]; then
+    wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
+fi
+
+echo "
+#
+# Install magerun-addons
+#
+"
+
+# Install Kalen Jordans' MageRun Addons (for customer sterilisation)
+if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
+    mkdir -p ~/.n98-magerun/modules/
+    cd ~/.n98-magerun/modules/
+    git clone git@github.com:kalenjordan/magerun-addons.git
+    cd $MAGENTO1_ENV_WEBROOT
+fi
+
+echo "
+#
 # Create local.xml (if it doesn't already exist)
 #
 "
@@ -134,36 +159,11 @@ echo "
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
-if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == "true" ]]; then
+if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
     mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < sample-data.sql
 else
     mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_DB_NAME.bak.sql
 fi
-
-echo "
-#
-# Install magerun
-#
-"
-
-# Install n98-magerun
-if [[ ! -f ./n98-magerun.phar ]]; then
-    wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
-fi
-
-echo "
-#
-# Install magerun-addons
-#
-"
-
-# Install Kalen Jordans' MageRun Addons (for customer sterilisation)
-if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
-    mkdir -p ~/.n98-magerun/modules/
-    cd ~/.n98-magerun/modules/
-    git clone git@github.com:kalenjordan/magerun-addons.git
-fi
-
 
 echo "
 #
@@ -175,16 +175,8 @@ echo "
 find vendor media app/etc -type f -exec chmod u+w {} \;
 # Force correct permissions on directories
 find vendor media app/etc -type d -exec chmod u+w {} \;
-# Force correct ownership on files
-#find vendor media app/etc -type f -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
-# Force correct ownership on directories
-#find vendor media app/etc -type d -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
-# Set the sticky bit to ensure that files are generated with the right ownership
+# Set group id so files are generated with the right permissions and ownership
 find vendor media app/etc -type d -exec chmod g+s {} \;
-
-# Install frontend tools
-
-# git pull
 
 echo "
 #
@@ -195,15 +187,20 @@ echo "
 # Clear cache
 ./n98-magerun.phar cache:clean
 ./n98-magerun.phar cache:flush
-exit
+
 echo "
 #
 # Generate CSS
 #
 "
 
+cd $MAGENTO1_ENV_SKINDIRECTORY
+
 # Generate CSS
+yarn install
 gulp styles --disableMaps --prod
+
+cd $MAGENTO1_ENV_WEBROOT
 
 echo "
 #
@@ -260,18 +257,13 @@ echo "
 # Sterilise customer data
 #
 "
-
-# Create dummy customer with dummy addresses
-
-# Sterilise customer data
 ./n98-magerun.phar customer:anon
 
+# @todo Create dummy customer with dummy addresses
 
 echo "
 #
 # Enable cron
 #
 "
-
-# Enable cron
 php -f $MAGENTO1_ENV_WEBROOT/cron.php
