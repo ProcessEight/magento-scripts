@@ -1,4 +1,18 @@
 #!/usr/bin/env bash
+# This script must be run from inside the scripts folder, i.e.
+# $ cd /var/www/html/english-braids.localhost.com/scripts
+# $ ./update/10-prepare-composer.sh
+CONFIG_M1_FILEPATH=`pwd`/config-m1.env
+if [[ ! -f $CONFIG_M1_FILEPATH ]]; then
+    echo "
+#
+# Could not detect config-m1.env.
+# Create one first in $CONFIG_M1_FILEPATH
+# Script cannot continue. Exiting now
+#
+"
+    exit
+fi
 set -a; . `pwd`/config-m1.env
 
 # Cleanup

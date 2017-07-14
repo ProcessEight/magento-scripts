@@ -10,7 +10,7 @@ echo "Cleaning...
 `pwd`/../htdocs/var/view_preprocessed/source/frontend/*
 `pwd`/../htdocs/pub/static/frontend/*
 `pwd`/../htdocs/pub/static/_requirejs/frontend/*"
-rm -rf `pwd`/../htdocs/var/cache/* `pwd`/../htdocs/var/generation/* `pwd`/../htdocs/var/di/* `pwd`/../htdocs/var/tmp/* 
+rm -rf `pwd`/../htdocs/var/cache/* `pwd`/../htdocs/var/generation/* `pwd`/../htdocs/var/di/* `pwd`/../htdocs/var/tmp/*
 rm -rf `pwd`/../htdocs/var/page_cache/* `pwd`/../htdocs/var/view_preprocessed/css/frontend/* `pwd`/../htdocs/var/view_preprocessed/js/frontend/* `pwd`/../htdocs/var/view_preprocessed/source/frontend/*
 rm -rf `pwd`/../htdocs/pub/static/frontend/* `pwd`/../htdocs/pub/static/_requirejs/frontend/*
 echo "Cleaning automated testing sandbox files " 

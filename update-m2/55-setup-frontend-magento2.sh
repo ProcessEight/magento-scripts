@@ -5,6 +5,9 @@
 set -a; . `pwd`/config-m2.env
 cd $MAGENTO2_ENV_WEBROOT
 
+# Make sure we're running in developer mode
+php -f bin/magento deploy:mode:set developer
+
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
