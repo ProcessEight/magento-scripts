@@ -198,9 +198,9 @@ php -f bin/magento deploy:mode:set production --skip-compilation
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]];
     then
-        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/magento.cron.log
-        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/update.cron.log
-        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/setup.cron.log
+        touch /var/www/html/$MAGENTO2_ENV_WEBROOT/htdocs/var/log/magento.cron.log
+        touch /var/www/html/$MAGENTO2_ENV_WEBROOT/htdocs/var/log/update.cron.log
+        touch /var/www/html/$MAGENTO2_ENV_WEBROOT/htdocs/var/log/setup.cron.log
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
