@@ -37,7 +37,11 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 if [[ $MAGENTO2_DB_BACKUPFIRST == true ]]; then
-mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
+    if [[ ! -f mage-dbdump.sh ]]; then
+        wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
+    fi
+    ./mage-dbdump.sh -dzA
+#mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 
 if [[ $MAGENTO2_DB_IMPORT == true ]]; then
@@ -62,18 +66,18 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-# Make sure we can execute the CLI tool
-chmod u+x bin/magento
-# Force correct permissions on files
-sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-# Force correct permissions on directories
-sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-# Force correct ownership on files
-sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Force correct ownership on directories
-sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Set the group-id bit to ensure that files and directories are generated with the right ownership
-sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+## Make sure we can execute the CLI tool
+#chmod u+x bin/magento
+## Force correct permissions on files
+#sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+## Force correct permissions on directories
+#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+## Force correct ownership on files
+#sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+## Force correct ownership on directories
+#sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+## Set the group-id bit to ensure that files and directories are generated with the right ownership
+#sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
 echo "
 #
@@ -87,7 +91,7 @@ cd $MAGENTO2_ENV_WEBROOT
 composer install
 
 # Make sure we can execute the CLI tool
-chmod u+x bin/magento
+#chmod u+x bin/magento
 php -f bin/magento module:enable --all
 
 # Ensure the application is installed (especially if we re-imported the database)
@@ -194,7 +198,10 @@ php -f bin/magento deploy:mode:set production --skip-compilation
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]];
     then
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v "Ran jobs by schedule" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
+        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/magento.cron.log
+        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/update.cron.log
+        touch /var/www/html/englishbraids.webpos.co.uk/htdocs/var/log/setup.cron.log
+        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
         crontab /tmp/magento2-crontab
