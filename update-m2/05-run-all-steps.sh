@@ -37,11 +37,7 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 if [[ $MAGENTO2_DB_BACKUPFIRST == true ]]; then
-    if [[ ! -f mage-dbdump.sh ]]; then
-        wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
-    fi
-    ./mage-dbdump.sh -dzA
-#mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
+    mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 
 if [[ $MAGENTO2_DB_IMPORT == true ]]; then
