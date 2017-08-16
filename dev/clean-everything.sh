@@ -20,9 +20,9 @@ rm -rf `pwd`/../htdocs/dev/tests/unit/tmp/sandbox-*
 #redis-cli -n 2 flushdb
 #redis-cli -n 3 flushdb
 echo "Running setup:upgrade " 
-`pwd`/../htdocs/bin/magento setup:upgrade
-`pwd`/../htdocs/bin/magento cache:enable
+php -f `pwd`/../htdocs/bin/magento setup:upgrade
+php -f `pwd`/../htdocs/bin/magento cache:enable
 echo "Clearing caches "
-`pwd`/../htdocs/bin/magento cache:clean
-`pwd`/../htdocs/bin/magento cache:flush
+php -f `pwd`/../htdocs/bin/magento cache:clean
+php -f `pwd`/../htdocs/bin/magento cache:flush
 echo "All done!"

@@ -12,7 +12,7 @@ rm -rf var/generation/* var/di/*
 if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 # For multisites running Magento 2.0.x only
 then
-    bin/magento setup:di:compile-multi-tenant
+    php -f bin/magento setup:di:compile-multi-tenant
 else
-    bin/magento setup:di:compile
+    php -f bin/magento setup:di:compile
 fi

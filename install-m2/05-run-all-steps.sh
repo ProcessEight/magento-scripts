@@ -2,6 +2,16 @@
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
+CONFIG_M2_FILEPATH=`pwd`/config-m2.env
+if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
+    echo "
+#
+# Could not detect config-m2.env.
+# Create one first in $CONFIG_M2_FILEPATH
+# Script cannot continue. Exiting now
+#"
+exit
+fi
 set -a; . `pwd`/config-m2.env
 
 echo "
@@ -34,21 +44,28 @@ echo "
 # 3. Prepare Magento 2
 #
 "
-mkdir -p $MAGENTO2_ENV_WEBROOT
+
 cd $MAGENTO2_ENV_WEBROOT
-composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
+    mkdir -p $MAGENTO2_ENV_WEBROOT
+
+    echo "# Create a new, blank Magento 2 install"
+    composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+fi;
+composer require snowdog/frontools ^1.4
+
 echo "# Make sure we can execute the CLI tool"
 chmod u+x bin/magento
 echo "# Force correct permissions on files"
-find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
 echo "# Force correct permissions on directories"
-find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 775 {} \;
 echo "# Force correct ownership on files"
-find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 echo "# Force correct ownership on directories"
-find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 echo "# Set the sticky bit to ensure that files are generated with the right ownership"
-find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 echo "
 #
 # 4. Install Magento 2
@@ -56,7 +73,7 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
+php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
 --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
 --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
@@ -70,7 +87,7 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
-bin/magento maintenance:enable
+php -f bin/magento maintenance:enable
 
 # Force correct ownership on files
 #find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
@@ -78,12 +95,12 @@ bin/magento maintenance:enable
 #find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 
 # Code generation
-if [[ $MAGENTO2_ENV_MULTITENANT ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 then
     # For multisites running Magento 2.0.x only
-    bin/magento setup:di:compile-multi-tenant
+    php -f bin/magento setup:di:compile-multi-tenant
 else
-    bin/magento setup:di:compile
+    php -f bin/magento setup:di:compile
 fi
 
 # Static content generation
@@ -92,12 +109,12 @@ fi
 rm -rf pub/static/*
 export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE"
+if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
+    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 fi
-bin/magento $DEPLOY_COMMAND
+php -f bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
-bin/magento setup:static-content:deploy en_US --theme Magento/backend
+php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
 # Generate SASS
 cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
@@ -111,15 +128,15 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
-bin/magento maintenance:enable
+php -f bin/magento maintenance:enable
 
 # Don't remove the files we just generated
-bin/magento setup:upgrade --keep-generated
-bin/magento setup:db-schema:upgrade
-bin/magento setup:db-data:upgrade
+php -f bin/magento setup:upgrade --keep-generated
+php -f bin/magento setup:db-schema:upgrade
+php -f bin/magento setup:db-data:upgrade
 
 # Allow access to site again
-bin/magento maintenance:disable
+php -f bin/magento maintenance:disable
 
 echo "
 #
@@ -129,10 +146,10 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
-bin/magento cache:enable
+php -f bin/magento cache:enable
 
 # We skip compilation here because we've already done in the previous step
-bin/magento deploy:mode:set production --skip-compilation
+php -f bin/magento deploy:mode:set production --skip-compilation
 
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]];
@@ -141,5 +158,5 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]];
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
         "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
         crontab /tmp/magento2-crontab
-        bin/magento setup:cron:run
+        php -f bin/magento setup:cron:run
 fi

@@ -2,6 +2,16 @@
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
+CONFIG_M2_FILEPATH=`pwd`/config-m2.env
+if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
+    echo "
+#
+# Could not detect config-m2.env.
+# Create one first in $CONFIG_M2_FILEPATH
+# Script cannot continue. Exiting now
+#"
+exit
+fi
 set -a; . `pwd`/config-m2.env
 
 echo "
@@ -111,9 +121,9 @@ rm -rf var/generation/* var/di/*
 if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 # For multisites running Magento 2.0.x only
 then
-    bin/magento setup:di:compile-multi-tenant
+    php -f bin/magento setup:di:compile-multi-tenant
 else
-    bin/magento setup:di:compile
+    php -f bin/magento setup:di:compile
 fi
 
 echo "

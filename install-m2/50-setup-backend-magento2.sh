@@ -7,7 +7,7 @@ cd $MAGENTO2_ENV_WEBROOT
 
 # Code generation
 
-if [[ $MAGENTO2_ENV_MULTITENANT == "true" ]];
+if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 then
     # For multisites running Magento 2.0.x only
     bin/magento setup:di:compile-multi-tenant
