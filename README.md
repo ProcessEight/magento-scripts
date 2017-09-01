@@ -18,28 +18,28 @@ The instructions are specific to Ubuntu, but can be adapted to Windows/Mac.
 Let's begin.
 
 1. Clone the project repo:
-    ```bash
-    $ git clone git@bitbucket.org:purenetgit/english-braids.git englishbraids.test.dev
-    ```
+```bash
+$ git clone git@bitbucket.org:purenetgit/english-braids.git englishbraids.test.dev
+```
 1. Create a sym-link to the `magento2-deployment` scripts:
-    ```bash
-    $ cd englishbraids.test.dev
-    $ mkdir scripts
-    $ cd scripts
-    $ ln -s /var/www/html/magento2-deployment/update-m2 update-m2
-    ```
+```bash
+$ cd englishbraids.test.dev
+$ mkdir scripts
+$ cd scripts
+$ ln -s /var/www/html/magento2-deployment/update-m2 update-m2
+```
 1. Now create a environment variable file called `config-m2.env`. You can copy the sample one from the `magento-deployment` repo:
-    ```bash
-    $ cp /var/www/html/magento2-deployment/config-m2.env.sample config-m2.env
-    ```
+```bash
+$ cp /var/www/html/magento2-deployment/config-m2.env.sample config-m2.env
+```
 1. Update the config-m2.env file accordingly. See below for a list of the values and what the acceptable values are.
-    ```bash
-    $ nano config-m2.env
-    ```
+```bash
+$ nano config-m2.env
+```
 1. Now run the deployment scripts. You can run them individually (in order) or run the `05-run-all-steps.sh` script to do everything in one go.
-    ```bash
-    $ ./update-m2/05-run-all-steps.sh
-    ```
+```bash
+$ ./update-m2/05-run-all-steps.sh
+```
 
 Your Magento 2 project is now installed and ready to run.
 
@@ -60,9 +60,9 @@ Warning: Invalid argument supplied for foreach() in /var/www/html/englishbraids.
 Magento 2 is not installed, or is not installed correctly. Magento 2 needs to be installed to generate static content.
 
 ```bash
-There are no commands defined in tapp/design/frontend/florenceroby/default/template/checkout/cart.phtml: This logic should really be moved into a block class. There's also a typo in collegKitInBasket.
-he "cache" namespace.  
+There are no commands defined in the "cache" namespace.
 ```
+
 This can happen with any command, not just commands in the `cache` namespace. Magento 2 has hit upon an internal error, usually when loading the configuration. Clear the `var/generation`, `var/di` and cache folders and try running the command again.
 
 ```bash
