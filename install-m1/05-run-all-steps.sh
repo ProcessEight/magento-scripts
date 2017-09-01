@@ -94,7 +94,7 @@ if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/local.xml ]]; then
 
     echo "
 #
-# Create local.xml (if it doesn't already exist)
+# Could not find local.xml; Creating a new one now
 #
     "
 
@@ -173,9 +173,9 @@ fi
 
 if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/config.xml ]]; then
 
-echo "
+    echo "
 #
-# Create config.xml
+# Could not find config.xml; Creating a new one now
 #
 "
 
@@ -342,17 +342,22 @@ echo "
 #
 "
 
-# Prepare database
+echo "Creating database...";
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
+echo "Creating user...";
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
+echo "Granting permissions on user...";
 mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
 if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
     echo "Installing sample data from $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql"
     mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql
 else
-    wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
+    echo "Restoring database using mage-dbdump.sh...";
+    cd $MAGENTO1_ENV_WEBROOT
+    if [[ ! -f $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh ]]; then
+        wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
+    fi
     $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh -rz
-    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_DB_NAME.bak.sql
 fi
 
 echo "
