@@ -18,12 +18,12 @@ echo "setup:install --base-url=%env.MAGENTO2_ENV_HOSTNAME% \
 --db-host=%env.MAGENTO2_DB_HOSTNAME% --db-name=%env.MAGENTO2_DB_NAME% --db-user=%env.MAGENTO2_DB_USERNAME% --db-password=%env.MAGENTO2_DB_PASSWORD% \
 --admin-firstname=%env.MAGENTO2_ADMIN_FIRSTNAME% --admin-lastname=%env.MAGENTO2_ADMIN_LASTNAME% --admin-email=%env.MAGENTO2_ADMIN_EMAIL% \
 --admin-user=%env.MAGENTO2_ADMIN_USERNAME% --admin-password=%env.MAGENTO2_ADMIN_PASSWORD% --language=%env.MAGENTO2_LOCALE_CODE% \
---currency=%env.MAGENTO2_LOCALE_CURRENCY% --timezone=%env.MAGENTO2_LOCALE_TIMEZONE% --use-rewrites=%env.MAGENTO2_ENV_REWRITES% --backend-frontname=%env.MAGENTO2_ADMIN_FRONTNAME% --admin-use-security-key=%env.MAGENTO2_ENV_SECURITYKEY% \
+--currency=%env.MAGENTO2_LOCALE_CURRENCY% --timezone=%env.MAGENTO2_LOCALE_TIMEZONE% --use-rewrites=%env.MAGENTO2_ENV_USEREWRITES% --backend-frontname=%env.MAGENTO2_ADMIN_FRONTNAME% --admin-use-security-key=%env.MAGENTO2_ENV_SECURITYKEY% \
 --session-save=%env.MAGENTO2_ENV_SESSIONSAVE% --cleanup-database"
 
 php -f bin/magento setup:install --base-url=http://%env.MAGENTO2_ENV_HOSTNAME%/ \
 --db-host=%env.MAGENTO2_DB_HOSTNAME% --db-name=%env.MAGENTO2_DB_NAME% --db-user=%env.MAGENTO2_DB_USERNAME% --db-password=%env.MAGENTO2_DB_PASSWORD% \
 --admin-firstname=%env.MAGENTO2_ADMIN_FIRSTNAME% --admin-lastname=%env.MAGENTO2_ADMIN_LASTNAME% --admin-email=%env.MAGENTO2_ADMIN_EMAIL% \
 --admin-user=%env.MAGENTO2_ADMIN_USERNAME% --admin-password=%env.MAGENTO2_ADMIN_PASSWORD% --language=%env.MAGENTO2_LOCALE_CODE% \
---currency=%env.MAGENTO2_LOCALE_CURRENCY% --timezone=%env.MAGENTO2_LOCALE_TIMEZONE% --use-rewrites=%env.MAGENTO2_ENV_REWRITES% --backend-frontname=%env.MAGENTO2_ADMIN_FRONTNAME% --admin-use-security-key=%env.MAGENTO2_ENV_SECURITYKEY% \
+--currency=%env.MAGENTO2_LOCALE_CURRENCY% --timezone=%env.MAGENTO2_LOCALE_TIMEZONE% --use-rewrites=%env.MAGENTO2_ENV_USEREWRITES% --backend-frontname=%env.MAGENTO2_ADMIN_FRONTNAME% --admin-use-security-key=%env.MAGENTO2_ENV_SECURITYKEY% \
 --session-save=%env.MAGENTO2_ENV_SESSIONSAVE% --cleanup-database
