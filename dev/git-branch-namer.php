@@ -4,10 +4,9 @@
  * php -f git-branch-namer.php
  */
 
-$branchName ="    FRB-545
+$branchName ="    FRB-548
 
-College Kit MOTO - College shipping options not appearing";
-
+Orders stuck at pending payment";
 $branchName = trim($branchName, '.');
 
 $branchName = str_replace(['    '], '', $branchName);
