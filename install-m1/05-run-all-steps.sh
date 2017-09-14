@@ -437,7 +437,7 @@ sed -i -e "s/#ini_set('display_errors', 1);/ini_set('display_errors', 1);/g" ind
 
 echo "
 #
-# Create new admin user
+# Create new admin user. If MAGENTO1_ADMIN_USERNAME already exists, you will be asked to delete it first
 #
 "
 
