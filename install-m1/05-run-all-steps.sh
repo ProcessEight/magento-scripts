@@ -40,8 +40,7 @@ echo "{
     },
     \"require\": {
         \"magento-hackathon/magento-composer-installer\": \"~3.0\",
-        \"aydin-hassan/magento-core-composer-installer\": \"~1.2\",
-        \"firegento/magento\": \"~1.9.3\"
+        \"aydin-hassan/magento-core-composer-installer\": \"~1.2\"
     },
     \"require-dev\": {
         \"inchoo/php7\": \"$INCHOOPHP7_BRANCH\"
@@ -360,11 +359,11 @@ else
     $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh -rz
 fi
 
-echo "
+#echo "
 #
 # Set permissions and ownership
 #
-"
+#"
 cd $MAGENTO1_ENV_WEBROOT
 if [[ ! -d media ]]; then
     mkdir media
@@ -451,6 +450,15 @@ echo "
 #
 "
 $MAGERUN_PATH customer:anon
+
+echo "
+#
+# Verify Inchoo_PHP7 compatibility module for M1 is configured correctly
+#
+"
+cd $MAGENTO1_ENV_WEBROOT/shell
+php -f inchoo_php7_test.php
+
 
 # @TODO Create dummy customer with dummy addresses
 
