@@ -1,6 +1,47 @@
 # Magento 2 Deployment
 
+## TODO
+* Add a new env variable which will allow switching between LESS/Grunt and SASS/Gulp CSS generation
+
+## Setup a new instance of a brand-new project
+
+Use this workflow when working on a new project which does not already have a project repository.
+
+Create a new directory in your webroot, then enter it:
+```bash
+mkdir new-project
+cd new-project
+```
+
+Create a scripts directory and in there add the sym-links to the magento2-deployment repository directory
+```bash
+mkdir scripts
+cd scripts
+```
+
+Now copy the `config-m2.env.sample` file to the scripts directory and update the information inside it.
+```bash
+cp ../magento2-deployment/config-m2.env.sample config-m2.env
+ln -s /var/www/html/magento2-deployment/dev
+ln -s /var/www/html/magento2-deployment/install-m2
+```
+
+Now you can run the install script:
+```bash
+./install-m2/05-run-all-steps.sh
+```
+
+Finally, run the setup localhost script to create a new Nginx virtual host and add the domain to your hosts file:
+```bash
+sudo ./dev/setup-magento2-localhost.sh
+```
+
+You should now be able to access the project from your browser.
+
+
 ## Setup a new instance of an existing project
+
+Use this workflow when working on a new project which does already have a project repository.
 
 This guide assumes that you have:
 
