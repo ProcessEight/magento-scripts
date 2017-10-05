@@ -195,15 +195,15 @@ echo "
 "
 
 # Force correct permissions on files
-find var vendor media app/etc -type f -exec chmod u+w {} \;
+#find var vendor media app/etc -type f -exec chmod u+w {} \;
 # Force correct permissions on directories
-find var vendor media app/etc -type d -exec chmod u+w {} \;
+#find var vendor media app/etc -type d -exec chmod u+w {} \;
 # Force correct ownership on files
 #find var vendor media app/etc -type f -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
 # Force correct ownership on directories
 #find var vendor media app/etc -type d -exec chown $MAGENTO1_ENV_CLIUSER:$MAGENTO1_ENV_WEBSERVERGROUP {} \;
 # Set the sticky bit to ensure that files are generated with the right ownership
-find var vendor media app/etc -type d -exec chmod g+s {} \;
+#find var vendor media app/etc -type d -exec chmod g+s {} \;
 
 # Install frontend tools
 
@@ -242,9 +242,9 @@ echo "
 "
 
 # Generate CSS
-cd "$MAGENTO1_ENV_WEBROOT/$MAGENTO1_ENV_SKINDIRECTORY"
-gulp build:production --disableMaps --prod
-cd $MAGENTO1_ENV_WEBROOT
+#cd "$MAGENTO1_ENV_WEBROOT/$MAGENTO1_ENV_SKINDIRECTORY"
+#gulp build:production --disableMaps --prod
+#cd $MAGENTO1_ENV_WEBROOT
 
 echo "
 #
@@ -304,11 +304,11 @@ echo "
 ./n98-magerun.phar --skip-root-check customer:anon
 
 
-echo "
-#
-# Enable cron
-#
-"
+#echo "
+##
+## Enable cron
+##
+#"
 
 # Enable cron
-php -f $MAGENTO1_ENV_WEBROOT/cron.php
+#php -f $MAGENTO1_ENV_WEBROOT/cron.php

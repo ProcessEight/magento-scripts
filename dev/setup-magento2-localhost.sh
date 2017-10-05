@@ -13,7 +13,7 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
 "
 exit
 fi
-set -a; . `pwd`/config-m1.env
+set -a; . `pwd`/config-m2.env
 
 # Cleanup
 sudo rm -f /etc/nginx/sites-enabled/$MAGENTO2_ENV_HOSTNAME

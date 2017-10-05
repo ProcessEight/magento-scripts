@@ -52,7 +52,6 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
 fi;
 cd $MAGENTO2_ENV_WEBROOT
-composer require snowdog/frontools ^1.4
 
 #echo "# Make sure we can execute the CLI tool"
 #chmod u+x bin/magento
@@ -86,9 +85,6 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-# Remove customer access to site (whitelisted IPs can still access frontend/backend)
-php -f bin/magento maintenance:enable
-
 # Force correct ownership on files
 #find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 # Force correct ownership on directories
@@ -115,10 +111,6 @@ fi
 php -f bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
 php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
-
-# Generate SASS
-cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
-gulp styles --disableMaps --prod
 
 echo "
 #
@@ -152,11 +144,10 @@ php -f bin/magento cache:enable
 php -f bin/magento deploy:mode:set production --skip-compilation
 
 # Enable Magento 2 cron
-if [[ $MAGENTO2_ENV_ENABLECRON ]];
-    then
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v "Ran jobs by schedule" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
-        crontab /tmp/magento2-crontab
-        php -f bin/magento setup:cron:run
+if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run > $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
+    crontab /tmp/magento2-crontab
+    php -f bin/magento setup:cron:run
 fi

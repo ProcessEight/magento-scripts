@@ -3,12 +3,26 @@
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
 CONFIG_M2_FILEPATH=`pwd`/config-m2.env
+PROJECT_ROOT_PATH=`pwd`
+if [[ 'scripts' != ${PROJECT_ROOT_PATH: -7} ]]; then
+    echo "
+#
+# The script detected you are running this script from an invalid location.
+# Make sure you are running this script from the scripts directory.
+# The script detected $PROJECT_ROOT_PATH
+#
+# Script cannot continue. Exiting now.
+#"
+exit
+fi
 if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
     echo "
 #
 # Could not detect config-m2.env.
-# Create one first in $CONFIG_M2_FILEPATH
-# Script cannot continue. Exiting now
+# Create one first in $PROJECT_ROOT_PATH/config-m2.env
+# and make sure you are running this script from the scripts directory.
+#
+# Script cannot continue. Exiting now.
 #"
 exit
 fi
@@ -98,7 +112,7 @@ composer install
 
 # Make sure we can execute the CLI tool
 #chmod u+x bin/magento
-php -f bin/magento module:enable --all
+#php -f bin/magento module:enable --all
 
 # Ensure the application is installed (especially if we re-imported the database)
 php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
@@ -118,13 +132,13 @@ cd $MAGENTO2_ENV_WEBROOT
 
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/*
-if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
-# For multisites running Magento 2.0.x only
-then
-    php -f bin/magento setup:di:compile-multi-tenant
-else
-    php -f bin/magento setup:di:compile
-fi
+#if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
+## For multisites running Magento 2.0.x only
+#then
+#    php -f bin/magento setup:di:compile-multi-tenant
+#else
+#    php -f bin/magento setup:di:compile
+#fi
 
 echo "
 #
@@ -140,29 +154,29 @@ php -f bin/magento deploy:mode:set developer
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
 rm -rf pub/static/*
-export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
+#export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-fi
+#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
+#    DEPLOY_COMMAND="$DEPLOY_COMMAND $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
+#fi
 
 # Generate static assets for configured themes
-php -f bin/magento $DEPLOY_COMMAND
+#php -f bin/magento $DEPLOY_COMMAND
 
 # Generate static assets for Admin themes
-php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
+#php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend --theme Purenet/backend
 
-cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
+#cd $MAGENTO2_ENV_WEBROOT/vendor/snowdog/frontools
 
 #echo "# Install yarn for gulp"
 #curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 #echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
 #sudo apt-get update && sudo apt-get install yarn
-yarn install
+#yarn install
 
 # Generate SASS
-gulp styles --disableMaps --prod
+#gulp styles --disableMaps --prod
 
 echo "
 #
@@ -199,17 +213,16 @@ cd $MAGENTO2_ENV_WEBROOT
 php -f bin/magento cache:enable
 
 # We skip compilation here because we've already done in the previous step
-php -f bin/magento deploy:mode:set production --skip-compilation
+#php -f bin/magento deploy:mode:set production --skip-compilation
 
 # Enable Magento 2 cron
-if [[ $MAGENTO2_ENV_ENABLECRON ]];
-    then
-        touch $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log
-        touch $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log
-        touch $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
-        "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
-        crontab /tmp/magento2-crontab
-        php -f bin/magento setup:cron:run
+if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
+    touch $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log
+    touch $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log
+    touch $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
+    "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
+    crontab /tmp/magento2-crontab
+    php -f bin/magento setup:cron:run
 fi
