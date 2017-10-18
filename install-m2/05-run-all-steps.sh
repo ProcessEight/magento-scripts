@@ -53,16 +53,16 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
 fi;
 cd $MAGENTO2_ENV_WEBROOT
 
-#echo "# Make sure we can execute the CLI tool"
-#chmod u+x bin/magento
+echo "# Making sure we can execute the CLI tool..."
+chmod u+x bin/magento
 #echo "# Force correct permissions on files"
 #sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
 #echo "# Force correct permissions on directories"
 #sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 775 {} \;
-#echo "# Force correct ownership on files"
-#sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#echo "# Force correct ownership on directories"
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+echo "# Forcing correct ownership on files..."
+sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+echo "# Forcing correct ownership on directories..."
+sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 #echo "# Set the sticky bit to ensure that files are generated with the right ownership"
 #sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 echo "
@@ -85,32 +85,27 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-# Force correct ownership on files
-#find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-# Force correct ownership on directories
-#find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-
 # Code generation
-if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
-then
+#if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
+#then
     # For multisites running Magento 2.0.x only
-    php -f bin/magento setup:di:compile-multi-tenant
-else
-    php -f bin/magento setup:di:compile
-fi
+#    php -f bin/magento setup:di:compile-multi-tenant
+#else
+#    php -f bin/magento setup:di:compile
+#fi
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
 # So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
-rm -rf pub/static/*
-export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
+#rm -rf pub/static/*
+#export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
 # Exclude configured themes
-if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
-    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-fi
-php -f bin/magento $DEPLOY_COMMAND
+#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
+#    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
+#fi
+#php -f bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
-php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
+#php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
 echo "
 #
@@ -123,9 +118,9 @@ cd $MAGENTO2_ENV_WEBROOT
 php -f bin/magento maintenance:enable
 
 # Don't remove the files we just generated
-php -f bin/magento setup:upgrade --keep-generated
-php -f bin/magento setup:db-schema:upgrade
-php -f bin/magento setup:db-data:upgrade
+php -f bin/magento setup:upgrade
+#php -f bin/magento setup:db-schema:upgrade
+#php -f bin/magento setup:db-data:upgrade
 
 # Allow access to site again
 php -f bin/magento maintenance:disable
@@ -135,13 +130,12 @@ echo "
 # 7. Set production settings
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
 
 # Enable all caches
 php -f bin/magento cache:enable
 
-# We skip compilation here because we've already done in the previous step
-php -f bin/magento deploy:mode:set production --skip-compilation
+# Make sure we're running in developer mode
+php -f bin/magento deploy:mode:set developer
 
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
