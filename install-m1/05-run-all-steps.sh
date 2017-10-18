@@ -2,6 +2,28 @@
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/english-braids.localhost.com/scripts
 # $ ./update/10-prepare-composer.sh
+
+#
+# This script will:
+#
+# 0. Create the MAGENTO1_ENV_WEBROOT if doesn't exist
+# 1. Create a composer.json file in the webroot and add inchoo/php7 as a dependency
+# 2. Install the project using composer install
+# 3. Searching for (and installing, if necessary) n98-magerun
+# 4. Install Kalen Jordans' MageRun Addons (for customer sterilisation)
+# 5. Check for the existence of local.xml and create one if necessary
+# 6. Create a new MySQL database and user
+# 7. Either install sample data or restore a db dump using mage-dbdump.sh
+# 8. Create a media directory is one is not found
+# 9. Clear the cache
+# 10. Generate CSS using yarn and gulp if gulpfile.js is found in the MAGENTO1_ENV_SKINDIRECTORY
+# 11. Enable maintenance mode, run all setup scripts, disable maintenance mode
+# 12. Uncomment display_errors in index.php
+# 13. Create a new admin user
+# 14. Sterilise customer data
+# 15. Verify Inchoo_PHP7 compatibility module for M1 is configured correctly
+#
+
 CONFIG_M1_FILEPATH=`pwd`/config-m1.env
 if [[ ! -f $CONFIG_M1_FILEPATH ]]; then
     echo "
@@ -14,6 +36,10 @@ if [[ ! -f $CONFIG_M1_FILEPATH ]]; then
 exit
 fi
 set -a; . `pwd`/config-m1.env
+
+if [[ ! -f $MAGENTO1_ENV_WEBROOT ]]; then
+    mkdir $MAGENTO1_ENV_WEBROOT;
+fi
 
 echo "
 #
@@ -32,6 +58,8 @@ else
     export SAMPLEDATA_VERSION=1.9.2.4
 fi
 
+# @TODO Replace this with composer commands, rather than manually creating the composer.json file
+
 echo "{
     \"name\": \"purenet/$MAGENTO1_DB_NAME\",
     \"description\": \"Magento $MAGENTO1_ENV_EDITION $MAGENTO1_ENV_VERSION\",
@@ -40,7 +68,8 @@ echo "{
     },
     \"require\": {
         \"magento-hackathon/magento-composer-installer\": \"~3.0\",
-        \"aydin-hassan/magento-core-composer-installer\": \"~1.2\"
+        \"aydin-hassan/magento-core-composer-installer\": \"~1.2\",
+        \"firegento/magento\": \"$MAGENTO1_ENV_VERSION\"
     },
     \"require-dev\": {
         \"inchoo/php7\": \"$INCHOOPHP7_BRANCH\"
@@ -50,8 +79,6 @@ echo "{
 cd $MAGENTO1_ENV_WEBROOT
 
 # Install the project
-# Reads the composer.lock file and installs/updates all dependencies to the specified version
-rm -f composer.lock
 composer install
 
 echo "
@@ -60,19 +87,21 @@ echo "
 #
 "
 
+# @TODO Replace this so it only checks in the home dir and web root
+
 # Search for and install n98-magerun
-export MAGERUN_PATH=./n98-magerun.phar
+export MAGERUN_COMMAND=./n98-magerun.phar
 if [[ ! -f ~/n98-magerun.phar ]]; then
     if [[ ! -f /var/www/html/n98-magerun.phar ]]; then
         if [[ ! -f ./n98-magerun.phar ]]; then
             wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
-            MAGERUN_PATH=./n98-magerun.phar
+            MAGERUN_COMMAND=./n98-magerun.phar
         fi
     else
-        MAGERUN_PATH=/var/www/html/n98-magerun.phar
+        MAGERUN_COMMAND="/var/www/html/n98-magerun.phar --root-dir=$MAGENTO1_ENV_WEBROOT"
     fi
 else
-    MAGERUN_PATH=~/n98-magerun.phar
+    MAGERUN_COMMAND="~/n98-magerun.phar --root-dir=$MAGENTO1_ENV_WEBROOT"
 fi
 
 # Install Kalen Jordans' MageRun Addons (for customer sterilisation)
@@ -85,17 +114,64 @@ if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
     "
     mkdir -p ~/.n98-magerun/modules/
     cd ~/.n98-magerun/modules/
-    git clone git@github.com:kalenjordan/magerun-addons.git
+    git clone git@github.com:kalenjordan/magerun-addons.git kalenjordan-magerun-addons
     cd $MAGENTO1_ENV_WEBROOT
+fi
+
+echo "
+#
+# 2. Prepare database
+#
+"
+
+echo "Creating database...";
+mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
+echo "Creating user...";
+mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
+echo "Granting permissions on user...";
+mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
+
+DB_INSTALLED=false;
+
+if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
+    echo "Installing sample data from $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql"
+    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql
+    DB_INSTALLED=true;
+else
+    if [[ -f $MAGENTO1_ENV_WEBROOT/var/db.sql.gz ]]; then
+        echo "Restoring database using mage-dbdump.sh...";
+        cd $MAGENTO1_ENV_WEBROOT
+        if [[ ! -f $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh ]]; then
+            wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
+        fi
+        $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh -rz
+        DB_INSTALLED=true;
+    fi
+fi
+
+if [[ $DB_INSTALLED = false ]]; then
+
+echo "
+#
+# Installing Magento $MAGENTO1_ENV_VERSION in $MAGENTO1_ENV_WEBROOT
+#
+"
+
+    $MAGERUN_COMMAND install \
+        --dbHost=$MAGENTO1_DB_HOSTNAME --dbUser=$MAGENTO1_DB_USERNAME --dbPass=$MAGENTO1_DB_PASSWORD --dbName=$MAGENTO1_DB_NAME \
+        --installSampleData=$MAGENTO1_ENV_INSTALLSAMPLEDATA --magentoVersion=$MAGENTO1_ENV_VERSION \
+        --installationFolder=$MAGENTO1_ENV_WEBROOT --baseUrl="http://$MAGENTO1_ENV_HOSTNAME/" \
+        --noDownload --forceUseDb
+
 fi
 
 if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/local.xml ]]; then
 
-    echo "
+echo "
 #
 # Could not find local.xml; Creating a new one now
 #
-    "
+"
 
     if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/local.xml.template ]]; then
         echo "<?xml version=\"1.0\"?>
@@ -167,7 +243,7 @@ if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/local.xml ]]; then
 " >> $MAGENTO1_ENV_WEBROOT/app/etc/local.xml.template
     fi
 
-    $MAGERUN_PATH local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
+    $MAGERUN_COMMAND local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
 fi
 
 if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/config.xml ]]; then
@@ -335,30 +411,6 @@ echo "<?xml version="1.0"?>
 " >> $MAGENTO1_ENV_WEBROOT/app/etc/config.xml
 fi
 
-echo "
-#
-# 2. Prepare database
-#
-"
-
-echo "Creating database...";
-mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create database $MAGENTO1_DB_NAME"
-echo "Creating user...";
-mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "create user '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME' identified by '$MAGENTO1_DB_PASSWORD'"
-echo "Granting permissions on user...";
-mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD -e "grant all privileges on $MAGENTO1_DB_NAME.* to '$MAGENTO1_DB_USERNAME'@'$MAGENTO1_DB_HOSTNAME'"
-if [[ $MAGENTO1_ENV_INSTALLSAMPLEDATA == true ]]; then
-    echo "Installing sample data from $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql"
-    mysql $MAGENTO1_DB_ROOTUSERNAME $MAGENTO1_DB_ROOTPASSWORD $MAGENTO1_DB_NAME < $MAGENTO1_ENV_WEBROOT/../scripts/install-m1/magento-sample-data-$SAMPLEDATA_VERSION/magento_sample_data_for_$SAMPLEDATA_VERSION.sql
-else
-    echo "Restoring database using mage-dbdump.sh...";
-    cd $MAGENTO1_ENV_WEBROOT
-    if [[ ! -f $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh ]]; then
-        wget sys.sonassi.com/mage-dbdump.sh && chmod +x ./mage-dbdump.sh
-    fi
-    $MAGENTO1_ENV_WEBROOT/mage-dbdump.sh -rz
-fi
-
 #echo "
 #
 # Set permissions and ownership
@@ -366,8 +418,14 @@ fi
 #"
 cd $MAGENTO1_ENV_WEBROOT
 if [[ ! -d media ]]; then
+echo "
+#
+# Creating media directory
+#
+"
     mkdir media
 fi
+
 # Force correct permissions on files
 #find vendor media app/etc -type f -exec chmod u+w {} \;
 # Force correct permissions on directories
@@ -381,8 +439,8 @@ echo "
 #
 "
 # Clear cache
-$MAGERUN_PATH cache:clean
-$MAGERUN_PATH cache:flush
+$MAGERUN_COMMAND cache:clean
+$MAGERUN_COMMAND cache:flush
 
 if [[ -f $MAGENTO1_ENV_SKINDIRECTORY/gulpfile.js ]]; then
 
@@ -407,7 +465,7 @@ echo "
 #
 "
 
-$MAGERUN_PATH sys:maintenance
+$MAGERUN_COMMAND sys:maintenance
 
 echo "
 #
@@ -415,7 +473,7 @@ echo "
 #
 "
 
-$MAGERUN_PATH sys:setup:run
+$MAGERUN_COMMAND sys:setup:run
 
 echo "
 #
@@ -423,7 +481,7 @@ echo "
 #
 "
 
-$MAGERUN_PATH sys:maintenance
+$MAGERUN_COMMAND sys:maintenance
 
 # @TODO Enable developer mode (for local environments)
 
@@ -441,15 +499,15 @@ echo "
 #
 "
 
-$MAGERUN_PATH admin:user:delete $MAGENTO1_ADMIN_USERNAME
-$MAGERUN_PATH admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
+$MAGERUN_COMMAND admin:user:delete $MAGENTO1_ADMIN_USERNAME
+$MAGERUN_COMMAND admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
 
 echo "
 #
 # Sterilising customer data
 #
 "
-$MAGERUN_PATH customer:anon
+$MAGERUN_COMMAND customer:anon
 
 echo "
 #

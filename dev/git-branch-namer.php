@@ -4,15 +4,16 @@
  * php -f git-branch-namer.php
  */
 
-$branchName ="    FRB-548
+$branchName = "    EBR-183
 
-Orders stuck at pending payment";
+Setup maintenance.ip";
+
 $branchName = trim($branchName, '.');
 
 $branchName = str_replace(['    '], '', $branchName);
 
-$branchName = str_replace(["\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/'], '-', $branchName);
+$branchName = str_replace(["\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':'], '-', $branchName);
 
 $branchName = str_replace('--', '-', $branchName);
 
-echo trim($branchName) . "\n";
+echo trim($branchName, '-') . "\n";
