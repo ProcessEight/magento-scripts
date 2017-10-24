@@ -12,7 +12,7 @@ $branchName = trim($branchName, '.');
 
 $branchName = str_replace(['    '], '', $branchName);
 
-$branchName = str_replace(["\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':'], '-', $branchName);
+$branchName = str_replace(["\n", "\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':'], '-', $branchName);
 
 $branchName = str_replace('--', '-', $branchName);
 

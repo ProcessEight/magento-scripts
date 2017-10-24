@@ -14,3 +14,6 @@ then
 else
     bin/magento setup:di:compile
 fi
+# Now that we've generated all the possible classes that could exist,
+# generate an optimised composer class map that supports faster autoloading
+composer dump-autoload -o

@@ -93,6 +93,9 @@ cd $MAGENTO2_ENV_WEBROOT
 #else
 #    php -f bin/magento setup:di:compile
 #fi
+# Now that we've generated all the possible classes that could exist,
+# generate an optimised composer class map that supports faster autoloading
+#composer dump-autoload -o
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment

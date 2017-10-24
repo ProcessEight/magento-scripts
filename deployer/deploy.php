@@ -78,6 +78,11 @@ task('magento:compile', function () {
     run("{{bin/php}} {{release_path}}/bin/magento setup:di:compile");
 });
 
+//desc('Optimise composer autoloader');
+//task('magento:composer:optimise-autoloader', function () {
+//    run("{{bin/composer}} composer dump-autoload -o");
+//});
+
 desc('Deploy assets');
 task('magento:deploy:assets', function () {
     run("{{bin/php}} {{release_path}}/bin/magento setup:static-content:deploy");
