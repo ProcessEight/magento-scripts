@@ -18,26 +18,64 @@ set -a; . `pwd`/config-m1.env
 # Cleanup
 sudo rm -f /etc/nginx/sites-enabled/$MAGENTO1_ENV_HOSTNAME
 sudo rm -f /etc/nginx/sites-available/$MAGENTO1_ENV_HOSTNAME
+sudo rm -rf /etc/ssl/$MAGENTO1_ENV_HOSTNAME
 
+# Generate self-signed SSL certificate
+
+# Set the wildcard domain
+DOMAIN="*.mor.dev"
+# Use an empty passphrase
+PASSPHRASE=""
+# Set our CSR variables
+SUBJ="
+C=US
+ST=Connecticut
+O=Vaprobash
+localityName=New Haven
+commonName=$DOMAIN
+organizationalUnitName=Purenet
+emailAddress=
+"
+
+sudo mkdir -p /etc/ssl/$MAGENTO1_ENV_HOSTNAME
+sudo openssl genrsa -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" 128
+sudo openssl req -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -key "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" -passin pass:$PASSPHRASE
+
+#sudo openssl req -new -subj $(echo -n "$SUBJ" | tr "\n" "/") \
+#    -key "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" \
+#    -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" \
+#    -passin pass:$PASSPHRASE
+ls -la /etc/ssl/$MAGENTO1_ENV_HOSTNAME/
+exit
+sudo openssl x509 -req -days 365 \
+    -in "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" \
+    -signkey "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" \
+    -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.crt"
 sudo echo "# Uncomment this if you don't already have a fastcgi_backend defined
-#upstream fastcgi_backend {
+#upstream fastcgi_backend_php70 {
 #        server  unix:/run/php/php7.0-fpm.sock;
 #}
 
 server {
     listen 80;
+    listen 443 ssl;
     server_name $MAGENTO1_ENV_HOSTNAME www.$MAGENTO1_ENV_HOSTNAME;
     root $MAGENTO1_ENV_WEBROOT;
 
     # Important for VirtualBox
     sendfile off;
 
+    ssl_certificate     /etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.crt;
+    ssl_certificate_key /etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key;
+
+    # Handle requests to the root folder (e.g. When someone requests http://$MAGENTO1_ENV_HOSTNAME/)
     location / {
         index index.php;
         try_files \$uri \$uri/ @handler;
         expires 30d;
     }
 
+    # Deny direct access to these folders
     location ^~ /app/                { deny all; }
     location ^~ /includes/           { deny all; }
     location ^~ /lib/                { deny all; }
@@ -50,31 +88,29 @@ server {
         try_files \$uri \$1.\$3;
     }
 
-    location  /. {
-        return 404;
+    # Ban any attempt to access dot files (e.g. .git, .htaccess, etc)
+    location ~* (?:^|/)\. {
+        deny all;
     }
 
+    # Redirect requests for the webroot folder to /index.php
     location @handler {
         rewrite / /index.php;
     }
 
-    location ^~ /git/ {
-        rewrite / /git.php;
-    }
-
+    # Remove trailing slash from requests for PHP files (e.g. /index.php/ > /index.php)
     location ~ .php/ {
         rewrite ^(.*.php)/ \$1 last;
     }
 
+    # Handle requests for .php files
     location ~ \.php$ {
         if (!-e \$request_filename) { rewrite / /index.php last; }
 
         expires                 off;
-        #fastcgi_pass           phpupstream;
-        fastcgi_pass            unix:/run/php/php7.0-fpm.sock;
+        fastcgi_pass            fastcgi_backend_php70;
         fastcgi_read_timeout    3600;
         fastcgi_param           SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        fastcgi_param           MAGE_IS_DEVELOPER_MODE 1;
         include                 fastcgi_params;
     }
 }
