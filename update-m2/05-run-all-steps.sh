@@ -53,7 +53,6 @@ if [[ ! -d ~/.composer/ ]]; then
 # Adding repo.magento.com access keys to ~/.composer/auth.json...
 #
 "
-
     mkdir -p ~/.composer/
 
     echo "{
@@ -122,9 +121,6 @@ echo "
 # Install the project
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 composer install
-
-# Make sure we can execute the CLI tool
-#chmod u+x bin/magento
 
 # Ensure the application is installed (especially if we re-imported the database)
 php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \

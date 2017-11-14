@@ -2,6 +2,7 @@ echo `pwd`/../htdocs
 echo "Cleaning...
 `pwd`/../htdocs/var/cache/*
 `pwd`/../htdocs/var/generation/*
+`pwd`/../htdocs/generated/*
 `pwd`/../htdocs/var/di/*
 `pwd`/../htdocs/var/tmp/*
 `pwd`/../htdocs/var/page_cache/*
