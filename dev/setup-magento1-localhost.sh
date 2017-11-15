@@ -21,36 +21,20 @@ sudo rm -f /etc/nginx/sites-available/$MAGENTO1_ENV_HOSTNAME
 sudo rm -rf /etc/ssl/$MAGENTO1_ENV_HOSTNAME
 
 # Generate self-signed SSL certificate
-
-# Set the wildcard domain
-DOMAIN="*.mor.dev"
-# Use an empty passphrase
-PASSPHRASE=""
-# Set our CSR variables
-SUBJ="
-C=US
-ST=Connecticut
-O=Vaprobash
-localityName=New Haven
-commonName=$DOMAIN
-organizationalUnitName=Purenet
-emailAddress=
-"
-
 sudo mkdir -p /etc/ssl/$MAGENTO1_ENV_HOSTNAME
-sudo openssl genrsa -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" 128
-sudo openssl req -new -subj "$(echo -n "$SUBJ" | tr "\n" "/")" -key "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" -passin pass:$PASSPHRASE
-
-#sudo openssl req -new -subj $(echo -n "$SUBJ" | tr "\n" "/") \
-#    -key "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" \
-#    -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" \
-#    -passin pass:$PASSPHRASE
-ls -la /etc/ssl/$MAGENTO1_ENV_HOSTNAME/
-exit
+sudo openssl genrsa -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" 2048
+echo "#
+# Use *.$MAGENTO1_ENV_HOSTNAME as the common name to generate a wildcard certificate.
+#"
+sudo openssl req -new \
+    -key "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" \
+    -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr"
 sudo openssl x509 -req -days 365 \
     -in "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.csr" \
     -signkey "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.key" \
     -out "/etc/ssl/$MAGENTO1_ENV_HOSTNAME/$MAGENTO1_ENV_HOSTNAME.crt"
+
+# Generate nginx config file
 sudo echo "# Uncomment this if you don't already have a fastcgi_backend defined
 #upstream fastcgi_backend_php70 {
 #        server  unix:/run/php/php7.0-fpm.sock;
