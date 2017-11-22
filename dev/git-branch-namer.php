@@ -4,9 +4,8 @@
  * php -f git-branch-namer.php
  */
 
-$branchName = "    EBR-183
-
-Setup maintenance.ip";
+$branchName = "FRB-557
+IE Not accepting Option on College Forms";
 
 $branchName = trim($branchName, '.');
 
