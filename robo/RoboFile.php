@@ -1,4 +1,7 @@
 <?php
+
+use Symfony\Component\Console\Input\InputOption;
+
 /**
  * This is project's console commands configuration for Robo task runner.
  *
@@ -10,18 +13,14 @@ class RoboFile extends \Robo\Tasks
      * Convert JIRA issue title into git-compatible string and then create new git branch with it
      *
      * @param string $issueTitle
+     * @param        $projectRoot
      */
-    public function gitBranchifyJiraIssueTitle($issueTitle)
+    public function gitBranchifyJiraIssueTitle($issueTitle, $projectRoot)
     {
-        $branchName = trim($issueTitle, '.');
-
-        $branchName = str_replace(['    '], '', $branchName);
-
-        $branchName = str_replace(["\n", "\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':'], '-', $branchName);
-
-        $branchName = str_replace('--', '-', $branchName);
+        $branchName = $this->getGitAcceptableBranchName($issueTitle);
 
         $this->taskGitStack()
+            ->dir($projectRoot)
             ->stopOnFail()
             ->checkout('-b ' . $branchName)
             ->run();
@@ -30,21 +29,19 @@ class RoboFile extends \Robo\Tasks
     /**
      * Convert JIRA issue title into git-compatible string and then create new git branch with it
      *
-     * @param string $jiraIssueUrl
+     * @param $jiraIssueUrl
+     * @param $projectRoot
+     *
+     * @internal param string $jiraIssueUrl
      */
-    public function gitBranchifyJiraIssueTitleFromUrl($jiraIssueUrl)
+    public function gitBranchifyJiraIssueTitleFromUrl($jiraIssueUrl, $projectRoot)
     {
-        $branchName = $this->parseJiraIssueTitleFromHtml($jiraIssueUrl);
+        $issueTitle = $this->parseJiraIssueTitleFromHtml($jiraIssueUrl);
 
-        $branchName = str_replace(['    '], '', $branchName);
-
-        $branchName = str_replace(['[', ']', "\n", "\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':', 'JIRA', '@', '<title>'], '-', $branchName);
-
-        $branchName = str_replace('--', '-', $branchName);
-
-        $branchName = trim($branchName, '-');
+        $branchName = $this->getGitAcceptableBranchName($issueTitle);
 
         $this->taskGitStack()
+             ->dir($projectRoot)
              ->stopOnFail()
              ->checkout('-b ' . $branchName)
              ->run();
@@ -92,5 +89,44 @@ class RoboFile extends \Robo\Tasks
         $title = substr($html, $start, $limit - $start);
 
         return $title;
+    }
+
+    /**
+     * @param $issueTitle
+     *
+     * @return string
+     */
+    protected function getGitAcceptableBranchName($issueTitle)
+    {
+        $branchName = trim($issueTitle, '.');
+
+        $branchName = str_replace(['    '], '', $branchName);
+
+        $branchName = str_replace([
+            '[',
+            ']',
+            "\n",
+            "\n\n",
+            ' - ',
+            ' ',
+            '.',
+            '£',
+            '$',
+            '#',
+            '~',
+            ',',
+            '\'',
+            '/',
+            ':',
+            'JIRA',
+            '@',
+            '<title>'
+        ], '-', $branchName);
+
+        $branchName = str_replace('--', '-', $branchName);
+
+        $branchName = trim($branchName, '-');
+
+        return $branchName;
     }
 }
