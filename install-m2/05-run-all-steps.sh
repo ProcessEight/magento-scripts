@@ -33,7 +33,6 @@ echo "
 # 10. Prepare composer
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
 
 COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]; then
@@ -42,6 +41,9 @@ if [[ "" == "$COMPOSER_CMD" ]]; then
 # Installing composer...
 #
 "
+    # Switch to home directory for user
+    cd ~
+    # Download latest stable version of composer
     wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer
 
     composer --version
@@ -99,12 +101,11 @@ else
 #
 # Script cannot continue. Exiting now.
 #"
-exit
+    exit
 fi;
 
 cd $MAGENTO2_ENV_WEBROOT
 
-echo "# Making sure we can execute the CLI tool..."
 chmod u+x bin/magento
 #echo "# Force correct permissions on files"
 #sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;

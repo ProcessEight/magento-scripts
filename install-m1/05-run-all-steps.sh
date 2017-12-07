@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This script must be run from inside the scripts folder, i.e.
-# $ cd /var/www/html/english-braids.localhost.com/scripts
+# $ cd /var/www/html/project.dev/scripts
 # $ ./update/10-prepare-composer.sh
 
 #
