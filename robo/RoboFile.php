@@ -1,7 +1,5 @@
 <?php
 
-use Symfony\Component\Console\Input\InputOption;
-
 /**
  * This is project's console commands configuration for Robo task runner.
  *
@@ -102,6 +100,8 @@ class RoboFile extends \Robo\Tasks
 
         $branchName = str_replace(['    '], '', $branchName);
 
+        $branchName = htmlspecialchars_decode($branchName, ENT_QUOTES|ENT_HTML5);
+
         $branchName = str_replace([
             '[',
             ']',
@@ -116,6 +116,7 @@ class RoboFile extends \Robo\Tasks
             '~',
             ',',
             '\'',
+            "'",
             '/',
             ':',
             'JIRA',

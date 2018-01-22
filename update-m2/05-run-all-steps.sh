@@ -39,15 +39,16 @@ COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]; then
     echo "
 #
-# Installing composer...
+# Could not detect Composer.
+# Make sure composer is installed and then try again.
+#
+# Script cannot continue. Exiting now.
 #
 "
-    wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer
-
-    composer --version
+exit
 fi
 
-if [[ ! -d ~/.composer/ ]]; then
+if [[ ! -f ~/.composer/auth.json ]]; then
     echo "
 #
 # Adding repo.magento.com access keys to ~/.composer/auth.json...
@@ -196,12 +197,4 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
     echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" >> /tmp/magento2-crontab
     crontab /tmp/magento2-crontab
     php -f bin/magento setup:cron:run
-fi
-
-# Install n98-magerun2
-if [[ ! -f /var/www/html/n98-magerun2.phar ]]; then
-    cd /var/www/html/
-    wget https://files.magerun.net/n98-magerun2.phar
-    chmod +x ./n98-magerun2.phar
-    cd $MAGENTO2_ENV_WEBROOT
 fi

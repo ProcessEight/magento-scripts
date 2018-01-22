@@ -38,15 +38,13 @@ COMPOSER_CMD=$(which composer)
 if [[ "" == "$COMPOSER_CMD" ]]; then
     echo "
 #
-# Installing composer...
+# The script has detected that Composer is not installed.
+# The script does not have permissions to install it.
+# To continue, install Composer first
 #
-"
-    # Switch to home directory for user
-    cd ~
-    # Download latest stable version of composer
-    wget https://raw.githubusercontent.com/composer/getcomposer.org/a68fc08d2de42237ae80d77e8dd44488d268e13d/web/installer -O - -q | php -- --quiet --filename=composer
-
-    composer --version
+# Script cannot continue. Exiting now.
+#"
+    exit
 fi
 
 if [[ ! -d ~/.composer/ ]]; then
@@ -101,10 +99,22 @@ else
 #
 # Script cannot continue. Exiting now.
 #"
-    exit
+#    exit
 fi;
 
 cd $MAGENTO2_ENV_WEBROOT
+
+if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
+    echo "
+#
+# The script has detected that the $MAGENTO2_ENV_WEBROOT directory does not exist.
+#
+# To continue, verify permissions and ownership and try again.
+#
+# Script cannot continue. Exiting now.
+#"
+    exit
+fi
 
 chmod u+x bin/magento
 #echo "# Force correct permissions on files"
