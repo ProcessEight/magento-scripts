@@ -24,7 +24,7 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
 #
 # Script cannot continue. Exiting now.
 #"
-exit
+    exit
 fi
 set -a; . `pwd`/config-m2.env
 
@@ -149,7 +149,7 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 #
-# Code generation (PRODUCTION ONLY)
+# Code generation (PRODUCTION MODE ONLY)
 #
 #if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 #then
