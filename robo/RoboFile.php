@@ -102,27 +102,7 @@ class RoboFile extends \Robo\Tasks
 
         $branchName = htmlspecialchars_decode($branchName, ENT_QUOTES|ENT_HTML5);
 
-        $branchName = str_replace([
-            '[',
-            ']',
-            "\n",
-            "\n\n",
-            ' - ',
-            ' ',
-            '.',
-            '£',
-            '$',
-            '#',
-            '~',
-            ',',
-            '\'',
-            "'",
-            '/',
-            ':',
-            'JIRA',
-            '@',
-            '<title>'
-        ], '-', $branchName);
+        $branchName = str_replace(["\n", "\n\n", ' - ', ' ', '.', '£', '$', '#', '~', ',', '\'', '/', ':', '&', '!', '"', '%', '^', '*', '(', ')', '+', '=', '{', '}', '[', ']', ';', '@', '<', '>', '?', '|', '`', '¬'], '-', $branchName);
 
         $branchName = str_replace('--', '-', $branchName);
 
