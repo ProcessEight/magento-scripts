@@ -60,24 +60,24 @@ Let's begin.
 
 1. Clone the project repo:
 ```bash
-$ git clone git@bitbucket.org:purenetgit/english-braids.git englishbraids.test.dev
+$ git clone git@bitbucket.org:purenetgit/your-project.git your-project
 ```
-1. Create a sym-link to the `magento2-deployment` scripts:
+2. Create a sym-link to the `magento2-deployment` scripts:
 ```bash
-$ cd englishbraids.test.dev
+$ cd yourproject.test.dev
 $ mkdir scripts
 $ cd scripts
 $ ln -s /var/www/html/magento2-deployment/update-m2 update-m2
 ```
-1. Now create a environment variable file called `config-m2.env`. You can copy the sample one from the `magento-deployment` repo:
+3. Now create a environment variable file called `config-m2.env`. You can copy the sample one from the `magento-deployment` repo:
 ```bash
-$ cp /var/www/html/magento2-deployment/config-m2.env.sample config-m2.env
-```
-1. Update the config-m2.env file accordingly. See below for a list of the values and what the acceptable values are.
+$ cp /var/www/html/magento2-deployment/config-m2.env.sample /var/www/html/your-project/scripts/config-m2.env
+````
+4. Update the config-m2.env file accordingly. See below for a list of the values and what the acceptable values are.
 ```bash
 $ nano config-m2.env
 ```
-1. Now run the deployment scripts. You can run them individually (in order) or run the `05-run-all-steps.sh` script to do everything in one go.
+5. Now run the deployment scripts. You can run them individually (in order) or run the `05-run-all-steps.sh` script to do everything in one go.
 ```bash
 $ ./update-m2/05-run-all-steps.sh
 ```
@@ -86,7 +86,7 @@ Your Magento 2 project is now installed and ready to run.
 
 If you're developing locally and need to create a virtual host, you can use the `setup-magento2-localhost.sh` script in the `magento2-deployment` repository:
 ```bash
-$ cd /var/www/html/englishbraids.test.dev/scripts
+$ cd /var/www/html/your-project.test/scripts
 $ ln -s /var/www/html/magento2-deployment/dev dev
 $ sudo ./dev/setup-magento2-localhost.sh
 ```
@@ -96,7 +96,7 @@ This script will create an Nginx virtual host and add an entry to your hosts fil
 
 ```bash
 # When running bin/magento setup:static-content:deploy
-Warning: Invalid argument supplied for foreach() in /var/www/html/englishbraids.test.dev/htdocs/vendor/magento/module-store/Model/Config/Processor/Fallback.php on line 125  
+Warning: Invalid argument supplied for foreach() in /var/www/html/your-project.test/htdocs/vendor/magento/module-store/Model/Config/Processor/Fallback.php on line 125  
 ```
 Magento 2 is not installed, or is not installed correctly. Magento 2 needs to be installed to generate static content.
 
@@ -107,7 +107,7 @@ There are no commands defined in the "cache" namespace.
 This can happen with any command, not just commands in the `cache` namespace. Magento 2 has hit upon an internal error, usually when loading the configuration. Clear the `var/generation`, `var/di` and cache folders and try running the command again.
 
 ```bash
-Could not scan for classes inside "/var/www/html/englishbraids.test/htdocs/vendor/colinmollenhour/cache-backend-redis/Cm/Cache/Backend/Redis.php" which does not appear to be a file nor a folder  
+Could not scan for classes inside "/var/www/html/your-project/htdocs/vendor/colinmollenhour/cache-backend-redis/Cm/Cache/Backend/Redis.php" which does not appear to be a file nor a folder  
 ```
 The composer cache is corrupt. Clean it using:
 ```bash
