@@ -76,7 +76,7 @@ if [[ $MAGENTO2_DB_BACKUPFIRST == true ]]; then
     mysqldump $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME > $MAGENTO2_DB_NAME.bak.sql
 fi
 
-if [[ $MAGENTO2_DB_IMPORT == true ]]; then
+if [[ $MAGENTO2_DB_RESET == true ]]; then
     echo "# Remove existing database"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME"
 
@@ -89,7 +89,9 @@ if [[ $MAGENTO2_DB_IMPORT == true ]]; then
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE DATABASE $MAGENTO2_DB_NAME"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+fi
 
+if [[ $MAGENTO2_DB_IMPORT == true ]]; then
     echo "# Importing database dump"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME < $MAGENTO2_DB_DUMPNAME
 fi
@@ -159,8 +161,8 @@ echo "
 "
 
 # Update to the specified version
-composer require magento/product-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_VERSION --no-update
-composer update
+#composer require magento/product-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_VERSION --no-update
+#composer update
 
 rm -rf $MAGENTO2_ENV_WEBROOT/var/cache/* $MAGENTO2_ENV_WEBROOT/var/page_cache/* $MAGENTO2_ENV_WEBROOT/var/generation/* $MAGENTO2_ENV_WEBROOT/generated/*
 
@@ -198,3 +200,6 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
     crontab /tmp/magento2-crontab
     php -f bin/magento setup:cron:run
 fi
+
+# Regenerate frontend assets
+gulp prod
