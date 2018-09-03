@@ -21,14 +21,14 @@ echo "Clearing all caches in redis for project "
 redis-cli -n 2 flushdb
 redis-cli -n 3 flushdb
 #echo "Skipping redis flushdb "
-echo "Running setup:upgrade " 
-php -f `pwd`/../htdocs/bin/magento setup:upgrade
-php -f `pwd`/../htdocs/bin/magento cache:enable
-#echo "Skipping setup:upgrade "
-#echo "Skipping cache:enable "
-echo "Clearing caches "
-php -f `pwd`/../htdocs/bin/magento cache:clean
-php -f `pwd`/../htdocs/bin/magento cache:flush
-#echo "Skipping cache:clean "
-#echo "Skipping cache:flush "
+#echo "Running setup:upgrade " 
+#php -f `pwd`/../htdocs/bin/magento setup:upgrade
+#php -f `pwd`/../htdocs/bin/magento cache:enable
+echo "Skipping setup:upgrade "
+echo "Skipping cache:enable "
+#echo "Clearing caches "
+#php -f `pwd`/../htdocs/bin/magento cache:clean
+#php -f `pwd`/../htdocs/bin/magento cache:flush
+echo "Skipping cache:clean "
+echo "Skipping cache:flush "
 echo "All done!"

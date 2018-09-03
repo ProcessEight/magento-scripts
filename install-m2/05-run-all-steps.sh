@@ -34,8 +34,8 @@ echo "
 #
 "
 
-COMPOSER_CMD=$(which composer)
-if [[ "" == "$COMPOSER_CMD" ]]; then
+COMPOSER_BIN=$(which composer)
+if [[ "" == "$COMPOSER_BIN" ]]; then
     echo "
 #
 # The script has detected that Composer is not installed.
@@ -89,7 +89,7 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     mkdir -p $MAGENTO2_ENV_WEBROOT
 
     echo "# Create a new, blank Magento 2 install"
-    composer create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+    $PHP_BIN $COMPOSER_BIN create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
 else
     echo "
 #
@@ -98,8 +98,8 @@ else
 # To continue, move, rename or delete the $MAGENTO2_ENV_WEBROOT directory.
 #
 # Script cannot continue. Exiting now.
-#"
-#    exit
+"
+    exit
 fi;
 
 cd $MAGENTO2_ENV_WEBROOT
@@ -110,6 +110,20 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
 # The script has detected that the $MAGENTO2_ENV_WEBROOT directory does not exist.
 #
 # To continue, verify permissions and ownership and try again.
+#
+# Script cannot continue. Exiting now.
+#"
+    exit
+fi
+
+if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
+    echo "
+#
+# The script has detected that the $MAGENTO2_ENV_WEBROOT/bin/magento file does not exist.
+#
+# This indicates that the installation of Magento 2 has failed.
+#
+# To continue, verify your Composer settings, remove the install directory ($MAGENTO2_ENV_WEBROOT) and try again.
 #
 # Script cannot continue. Exiting now.
 #"
@@ -127,6 +141,7 @@ chmod u+x bin/magento
 #sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
 #echo "# Set the sticky bit to ensure that files are generated with the right ownership"
 #sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+
 echo "
 #
 # 4. Install Magento 2
@@ -134,7 +149,7 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
+$PHP_BIN -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
 --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
 --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
@@ -154,13 +169,13 @@ cd $MAGENTO2_ENV_WEBROOT
 #if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
 #then
     # For multisites running Magento 2.0.x only
-#    php -f bin/magento setup:di:compile-multi-tenant
+#    $PHP_BIN -f bin/magento setup:di:compile-multi-tenant
 #else
-#    php -f bin/magento setup:di:compile
+#    $PHP_BIN -f bin/magento setup:di:compile
 #fi
 # Now that we've generated all the possible classes that could exist,
 # generate an optimised composer class map that supports faster autoloading
-#composer dump-autoload -o
+#$PHP_BIN $COMPOSER_BIN dump-autoload -o
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
@@ -171,9 +186,9 @@ cd $MAGENTO2_ENV_WEBROOT
 #if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
 #    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
 #fi
-#php -f bin/magento $DEPLOY_COMMAND
+#$PHP_BIN -f bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
-#php -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
+#$PHP_BIN -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
 echo "
 #
@@ -183,12 +198,12 @@ echo "
 cd $MAGENTO2_ENV_WEBROOT
 
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
-php -f bin/magento maintenance:enable
+$PHP_BIN -f bin/magento maintenance:enable
 
-php -f bin/magento setup:upgrade
+$PHP_BIN -f bin/magento setup:upgrade
 
 # Allow access to site again
-php -f bin/magento maintenance:disable
+$PHP_BIN -f bin/magento maintenance:disable
 
 echo "
 #
@@ -197,17 +212,29 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
+echo "
+#
 # Enable all caches
-php -f bin/magento cache:enable
+#
+"
+$PHP_BIN -f bin/magento cache:enable
 
-# Make sure we're running in developer mode
-php -f bin/magento deploy:mode:set developer
+echo "
+#
+# Enable developer mode
+#
+"
+$PHP_BIN -f bin/magento deploy:mode:set developer
 
+if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
+    echo "
+#
 # Enable Magento 2 cron
-if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run > $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
+#
+"
+    echo "* * * * * /usr/bin/$PHP_BIN $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
+    echo "* * * * * /usr/bin/$PHP_BIN $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
+    echo "* * * * * /usr/bin/$PHP_BIN $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run > $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
     crontab /tmp/magento2-crontab
-    php -f bin/magento setup:cron:run
+    $PHP_BIN -f bin/magento setup:cron:run
 fi
