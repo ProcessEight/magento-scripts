@@ -9,9 +9,9 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     mkdir -p $MAGENTO2_ENV_WEBROOT
 
     echo "# Create a new, blank Magento 2 install"
-    composer create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
 fi;
-composer require snowdog/frontools ^1.4
+$MAGENTO2_ENV_COMPOSERCOMMAND require snowdog/frontools ^1.4
 
 cd $MAGENTO2_ENV_WEBROOT
 echo "# Make sure we can execute the CLI tool"

@@ -15,9 +15,7 @@ echo "
 # Enabling Xdebug...
 #
 ";
-sudo ln -s /etc/php/7.2/mods-available/xdebug.ini /etc/php/7.2/fpm/conf.d/20-xdebug.ini
-sudo ln -s /etc/php/7.2/mods-available/xdebug.ini /etc/php/7.2/cli/conf.d/20-xdebug.ini
-sudo service php7.2-fpm restart
+sudo phpenmod -v 7.2 xdebug
 /usr/bin/php7.2 -v
 
 echo "

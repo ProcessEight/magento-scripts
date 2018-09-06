@@ -16,4 +16,4 @@ else
 fi
 # Now that we've generated all the possible classes that could exist,
 # generate an optimised composer class map that supports faster autoloading
-composer dump-autoload -o
+$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
