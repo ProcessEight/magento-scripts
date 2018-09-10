@@ -99,7 +99,7 @@ if [[ $MAGENTO2_DB_RESET == true ]]; then
 fi
 
 if [[ $MAGENTO2_DB_IMPORT == true ]]; then
-    echo "# Importing database dump"
+    echo "# Importing $MAGENTO2_DB_DUMPNAME into $MAGENTO2_DB_NAME"
     pv $MAGENTO2_DB_DUMPNAME | mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME
 fi
 
