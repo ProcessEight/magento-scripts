@@ -11,18 +11,17 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     echo "# Create a new, blank Magento 2 install"
     $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-community-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
 fi;
-$MAGENTO2_ENV_COMPOSERCOMMAND require snowdog/frontools ^1.4
 
 cd $MAGENTO2_ENV_WEBROOT
-echo "# Make sure we can execute the CLI tool"
-chmod u+x bin/magento
-echo "# Force correct permissions on files"
-sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
-echo "# Force correct permissions on directories"
-sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 665 {} \;
-echo "# Force correct ownership on files"
-sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-echo "# Force correct ownership on directories"
-sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-echo "# Set the sticky bit to ensure that files are generated with the right ownership"
-sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+#echo "# Make sure we can execute the CLI tool"
+#chmod u+x bin/magento
+#echo "# Force correct permissions on files"
+#sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
+#echo "# Force correct permissions on directories"
+#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 665 {} \;
+#echo "# Force correct ownership on files"
+#sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+#echo "# Force correct ownership on directories"
+#sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+#echo "# Set the sticky bit to ensure that files are generated with the right ownership"
+#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
