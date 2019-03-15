@@ -28,46 +28,74 @@ exit
 fi
 set -a; . `pwd`/config-m2.env
 
+#
+# Script-specific logic starts here
+#
+
 cd $MAGENTO2_ENV_WEBROOT
 
 echo "
 #
-# Running ./dev/clean-everything.sh
+# Cleaning backend files...
 #
 "
-echo $MAGENTO2_ENV_WEBROOT
-echo "Cleaning...
-$MAGENTO2_ENV_WEBROOT/var/cache/*
-$MAGENTO2_ENV_WEBROOT/var/generation/*
+echo "
 $MAGENTO2_ENV_WEBROOT/generated/*
+$MAGENTO2_ENV_WEBROOT/var/cache/*
+$MAGENTO2_ENV_WEBROOT/var/page_cache/*
+$MAGENTO2_ENV_WEBROOT/var/generation/*
 $MAGENTO2_ENV_WEBROOT/var/di/*
 $MAGENTO2_ENV_WEBROOT/var/tmp/*
-$MAGENTO2_ENV_WEBROOT/var/page_cache/*
+"
+rm -rf $MAGENTO2_ENV_WEBROOT/generated/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/cache/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/page_cache/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/generation/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/di/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/tmp/*
+echo "
+#
+# Cleaning automated testing sandbox files...
+#
+"
+rm -rf $MAGENTO2_ENV_WEBROOT/dev/tests/integration/tmp/sandbox-*
+rm -rf $MAGENTO2_ENV_WEBROOT/dev/tests/unit/tmp/sandbox-*
+
+echo "
+#
+# Cleaning frontend files...
+#
+"
+echo "
 $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
 $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
 $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
 $MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
 $MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*"
-rm -rf $MAGENTO2_ENV_WEBROOT/var/cache/* $MAGENTO2_ENV_WEBROOT/var/generation/* $MAGENTO2_ENV_WEBROOT/var/di/* $MAGENTO2_ENV_WEBROOT/var/tmp/* $MAGENTO2_ENV_WEBROOT/generated/*
-rm -rf $MAGENTO2_ENV_WEBROOT/var/page_cache/* $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/* $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/* $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
-rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/frontend/* $MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*
-echo "Cleaning automated testing sandbox files "
-rm -rf $MAGENTO2_ENV_WEBROOT/dev/tests/integration/tmp/sandbox-*
-rm -rf $MAGENTO2_ENV_WEBROOT/dev/tests/unit/tmp/sandbox-*
-#echo "Clearing all caches in redis for project "
-#redis-cli -n 2 flushdb
-#redis-cli -n 3 flushdb
-echo "Skipping redis flushdb "
-#echo "Running setup:upgrade "
-#php -f $MAGENTO2_ENV_WEBROOT/bin/magento setup:upgrade
-#php -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
-echo "Skipping setup:upgrade "
-echo "Skipping cache:enable "
-#echo "Clearing caches "
-#php -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:clean
-#php -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
-echo "Skipping cache:clean "
-echo "Skipping cache:flush "
+rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
+rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
+rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
+rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*
+
+echo "
+#
+# Clearing all Redis caches in project...
+# (do make sure the redis db numbers are correct)
+#
+"
+redis-cli -n 2 flushdb
+redis-cli -n 3 flushdb
+#echo "Skipping redis flushdb "
+
+echo "
+#
+# Running bin/magento cache:clean
+# Running bin/magento cache:flush
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:clean
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush
 
 echo "
 #
@@ -81,28 +109,28 @@ echo "
 # Running composer install
 #
 "
-cd ../htdocs && $MAGENTO2_ENV_COMPOSERCOMMAND install
+cd $MAGENTO2_ENV_WEBROOT && $MAGENTO2_ENV_COMPOSERCOMMAND install
 
 echo "
 #
-# Running bin/magento app:config:import
+# Running $MAGENTO2_ENV_PHPCOMMAND bin/magento app:config:import
 #
 "
-/var/www/html/magento2-deployment/dev/n98-magerun2-no-xdebug.sh app:config:import
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento app:config:import
 
 echo "
 #
-# Running bin/magento setup:upgrade
+# Running $MAGENTO2_ENV_PHPCOMMAND bin/magento setup:upgrade
 #
 "
-/var/www/html/magento2-deployment/dev/n98-magerun2-no-xdebug.sh setup:upgrade
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
 echo "
 #
-# Running bin/magento sys:setup:downgrade-versions
+# Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 #
 "
-/var/www/html/magento2-deployment/dev/n98-magerun2-no-xdebug.sh sys:setup:downgrade-versions
+$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 
 echo "
 #
