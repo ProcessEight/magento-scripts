@@ -27,6 +27,8 @@ alias xdephp71='/var/www/html/magento2-deployment/dev/enable-xdebug-php71.sh'
 alias xddphp71='/var/www/html/magento2-deployment/dev/disable-xdebug-php71.sh'
 alias xdephp72='/var/www/html/magento2-deployment/dev/enable-xdebug-php72.sh'
 alias xddphp72='/var/www/html/magento2-deployment/dev/disable-xdebug-php72.sh'
+alias xdephp73='/var/www/html/magento2-deployment/dev/enable-xdebug-php73.sh'
+alias xddphp73='/var/www/html/magento2-deployment/dev/disable-xdebug-php73.sh'
 
 #
 # Projects
@@ -43,15 +45,15 @@ alias wwwwsp='cd /var/www/html/wsp-weather-stop/htdocs'
 #
 # Magento 1
 #
-alias mr='/var/www/html/n98-magerun.phar '
-alias mr1='/var/www/html/n98-magerun.phar '
+alias mr='/usr/bin/php7.1 /var/www/html/n98-magerun.phar '
+alias mr1='/usr/bin/php7.1 /var/www/html/n98-magerun.phar '
 
 #
 # Magento 2
 #
 alias mm='/usr/bin/php7.1 -f bin/magento '
 alias mr2='/usr/bin/php7.1 /var/www/html/n98-magerun2.phar '
-alias pes='/var/www/html/pestle.phar'
+alias pes='/usr/bin/php7.1 /var/www/html/pestle.phar'
 alias wwwdata='sudo su - www-data -s /bin/bash '
 
 #

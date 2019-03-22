@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # This script must be run from inside the scripts folder, i.e.
-# $ cd /var/www/html/english-braids.localhost.com/scripts
+# $ cd /var/www/html/your-project.local/scripts
 # $ ./update/10-prepare-composer.sh
 CONFIG_M2_FILEPATH=`pwd`/config-m2.env
 if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
