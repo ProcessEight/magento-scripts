@@ -39,8 +39,11 @@ alias wwwd='cd /var/www/html'
 
 alias wwwmem='cd /var/www/html/magento225-example-modules/htdocs/'
 alias wwwws='cd /var/www/html/watson/watson-safari/'
+
 alias wwwdfl='cd /var/www/html/dfl/htdocs'
 alias wwwdfl167='cd /var/www/html/dfl-167/htdocs'
+alias wwweed='cd /var/www/html/eed-eel-datatech/'
+alias wwweeg='cd /var/www/html/eeg-eel-greentech/'
 alias wwwhat='cd /var/www/html/hat/htdocs'
 alias wwwll='cd /var/www/html/ll/htdocs'
 alias wwwmor='cd /var/www/html/mor/htdocs'
@@ -65,8 +68,8 @@ alias wwwdata='sudo su - www-data -s /bin/bash '
 #
 # MySQL
 #
-alias my='mycli -u root --password=MYSqlubuntu'
-alias mydump='mysqldump -u root --password=MYSqlubuntu'
+alias my='mycli -u root --password=password'
+alias mydump='mysqldump -u root --password=password'
 
 #
 # Misc

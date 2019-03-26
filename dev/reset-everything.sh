@@ -84,8 +84,16 @@ echo "
 # (do make sure the redis db numbers are correct)
 #
 "
+#
+# Database numbers are based on what is suggested in
+# https://devdocs.magento.com/guides/v2.3/config-guide/redis/redis-pg-cache.html
+#
+# default
+redis-cli -n 0 flushdb
+# page_cache
+redis-cli -n 1 flushdb
+# session
 redis-cli -n 2 flushdb
-redis-cli -n 3 flushdb
 #echo "Skipping redis flushdb "
 
 echo "
