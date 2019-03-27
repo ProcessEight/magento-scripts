@@ -79,30 +79,7 @@ echo "{
 cd $MAGENTO1_ENV_WEBROOT
 
 # Install the project
-composer install
-
-echo "
-#
-# Searching for (and installing, if necessary) n98-magerun...
-#
-"
-
-# @TODO Replace this so it only checks in the home dir and web root
-
-# Search for and install n98-magerun
-export MAGERUN_COMMAND=./n98-magerun.phar
-if [[ ! -f ~/n98-magerun.phar ]]; then
-    if [[ ! -f /var/www/html/n98-magerun.phar ]]; then
-        if [[ ! -f ./n98-magerun.phar ]]; then
-            wget https://files.magerun.net/n98-magerun.phar && chmod +x ./n98-magerun.phar
-            MAGERUN_COMMAND=./n98-magerun.phar
-        fi
-    else
-        MAGERUN_COMMAND="/var/www/html/n98-magerun.phar --root-dir=$MAGENTO1_ENV_WEBROOT"
-    fi
-else
-    MAGERUN_COMMAND="~/n98-magerun.phar --root-dir=$MAGENTO1_ENV_WEBROOT"
-fi
+$MAGENTO1_ENV_COMPOSERCOMMAND install
 
 # Install Kalen Jordans' MageRun Addons (for customer sterilisation)
 if [[ ! -d ~/.n98-magerun/modules/magerun-addons/ ]]; then
@@ -157,7 +134,7 @@ echo "
 #
 "
 
-    $MAGERUN_COMMAND install \
+    $MAGERUN1_COMMAND install \
         --dbHost=$MAGENTO1_DB_HOSTNAME --dbUser=$MAGENTO1_DB_USERNAME --dbPass=$MAGENTO1_DB_PASSWORD --dbName=$MAGENTO1_DB_NAME \
         --installSampleData=$MAGENTO1_ENV_INSTALLSAMPLEDATA --magentoVersion=$MAGENTO1_ENV_VERSION \
         --installationFolder=$MAGENTO1_ENV_WEBROOT --baseUrl="http://$MAGENTO1_ENV_HOSTNAME/" \
@@ -243,7 +220,7 @@ echo "
 " >> $MAGENTO1_ENV_WEBROOT/app/etc/local.xml.template
     fi
 
-    $MAGERUN_COMMAND local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
+    $MAGERUN1_COMMAND local-config:generate $MAGENTO1_DB_HOSTNAME $MAGENTO1_DB_USERNAME $MAGENTO1_DB_PASSWORD $MAGENTO1_DB_NAME $MAGENTO1_ENV_SESSIONSAVE $MAGENTO1_ADMIN_FRONTNAME
 fi
 
 if [[ ! -f $MAGENTO1_ENV_WEBROOT/app/etc/config.xml ]]; then
@@ -439,8 +416,8 @@ echo "
 #
 "
 # Clear cache
-$MAGERUN_COMMAND cache:clean
-$MAGERUN_COMMAND cache:flush
+$MAGERUN1_COMMAND cache:clean
+$MAGERUN1_COMMAND cache:flush
 
 if [[ -f $MAGENTO1_ENV_SKINDIRECTORY/gulpfile.js ]]; then
 
@@ -465,7 +442,7 @@ echo "
 #
 "
 
-$MAGERUN_COMMAND sys:maintenance
+$MAGERUN1_COMMAND sys:maintenance
 
 echo "
 #
@@ -473,7 +450,7 @@ echo "
 #
 "
 
-$MAGERUN_COMMAND sys:setup:run
+$MAGERUN1_COMMAND sys:setup:run
 
 echo "
 #
@@ -481,7 +458,7 @@ echo "
 #
 "
 
-$MAGERUN_COMMAND sys:maintenance
+$MAGERUN1_COMMAND sys:maintenance
 
 # @TODO Enable developer mode (for local environments)
 
@@ -499,15 +476,15 @@ echo "
 #
 "
 
-$MAGERUN_COMMAND admin:user:delete $MAGENTO1_ADMIN_USERNAME
-$MAGERUN_COMMAND admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
+$MAGERUN1_COMMAND admin:user:delete $MAGENTO1_ADMIN_USERNAME
+$MAGERUN1_COMMAND admin:user:create $MAGENTO1_ADMIN_USERNAME $MAGENTO1_ADMIN_EMAIL $MAGENTO1_ADMIN_PASSWORD $MAGENTO1_ADMIN_FIRSTNAME $MAGENTO1_ADMIN_LASTNAME
 
 echo "
 #
 # Sterilising customer data
 #
 "
-$MAGERUN_COMMAND customer:anon
+$MAGERUN1_COMMAND customer:anon
 
 echo "
 #
@@ -515,7 +492,7 @@ echo "
 #
 "
 cd $MAGENTO1_ENV_WEBROOT/shell
-php -f inchoo_php7_test.php
+$MAGENTO1_ENV_PHPCOMMAND -f inchoo_php7_test.php
 
 
 # @TODO Create dummy customer with dummy addresses
@@ -525,4 +502,4 @@ php -f inchoo_php7_test.php
 ## Enable cron
 ##
 #"
-#php -f $MAGENTO1_ENV_WEBROOT/cron.php
+#$MAGENTO1_ENV_PHPCOMMAND -f $MAGENTO1_ENV_WEBROOT/cron.php
