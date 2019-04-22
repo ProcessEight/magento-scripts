@@ -18,6 +18,7 @@ echo "
 sudo rm -f /etc/php/7.3/fpm/conf.d/20-xdebug.ini
 sudo rm -f /etc/php/7.3/cli/conf.d/20-xdebug.ini
 sudo service php7.3-fpm restart
+/usr/bin/php7.3 -v
 
 echo "
 #

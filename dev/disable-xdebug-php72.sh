@@ -15,7 +15,9 @@ echo "
 # Disabling Xdebug...
 #
 ";
-sudo phpdismod -v 7.2 xdebug
+sudo rm -f /etc/php/7.2/fpm/conf.d/20-xdebug.ini
+sudo rm -f /etc/php/7.2/cli/conf.d/20-xdebug.ini
+sudo service php7.2-fpm restart
 /usr/bin/php7.2 -v
 
 echo "

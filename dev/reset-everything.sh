@@ -96,21 +96,24 @@ redis-cli -n 1 flushdb
 redis-cli -n 2 flushdb
 #echo "Skipping redis flushdb "
 
+cd $MAGENTO2_ENV_WEBROOT
+
 echo "
 #
 # Running bin/magento cache:clean
 # Running bin/magento cache:flush
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:clean
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:clean
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
 
 echo "
 #
-# Restarting PHP 7.1
+# Restarting PHP 7.1 and 7.2
 #
 "
 sudo service php7.1-fpm restart
+sudo service php7.2-fpm restart
 
 echo "
 #

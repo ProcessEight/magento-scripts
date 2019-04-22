@@ -138,15 +138,10 @@ php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 
 # Force clean old files first. Don't rely on Magento 2.
 rm -rf var/generation/* var/di/* generated/*
-#if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
-## For multisites running Magento 2.0.x only
-#then
-#    php -f bin/magento setup:di:compile-multi-tenant
-#else
-#    php -f bin/magento setup:di:compile
-#fi
+
 # Now that we've generated all the possible classes that could exist,
 # generate an optimised composer class map that supports faster autoloading
+# (production mode only)
 #$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
 
 # Make sure we're running in developer mode
@@ -164,8 +159,8 @@ echo "
 "
 
 # Update to the specified version
-#$MAGENTO2_ENV_COMPOSERCOMMAND require magento/product-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_VERSION --no-update
-#$MAGENTO2_ENV_COMPOSERCOMMAND update
+$MAGENTO2_ENV_COMPOSERCOMMAND require magento/product-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_VERSION --no-update
+$MAGENTO2_ENV_COMPOSERCOMMAND update
 
 rm -rf $MAGENTO2_ENV_WEBROOT/var/cache/* $MAGENTO2_ENV_WEBROOT/var/page_cache/* $MAGENTO2_ENV_WEBROOT/var/generation/* $MAGENTO2_ENV_WEBROOT/generated/*
 
@@ -178,6 +173,7 @@ echo "
 # Disable customer access to site (whitelisted IPs can still access frontend/backend)
 php -f bin/magento maintenance:enable
 
+# Upgrade the database, run setup scripts of all modules
 php -f bin/magento setup:upgrade
 
 # Allow access to site again
@@ -193,16 +189,16 @@ echo "
 php -f bin/magento cache:enable
 
 # Enable Magento 2 cron
-#if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
-#    touch $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log
-#    touch $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log
-#    touch $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log
-#    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" > /tmp/magento2-crontab
-#    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" >> /tmp/magento2-crontab
-#    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" >> /tmp/magento2-crontab
-#    crontab /tmp/magento2-crontab
-#    php -f bin/magento setup:cron:run
-#fi
+if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
+    touch $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log
+    touch $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log
+    touch $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log
+    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" > /tmp/magento2-crontab
+    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" >> /tmp/magento2-crontab
+    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" >> /tmp/magento2-crontab
+    crontab /tmp/magento2-crontab
+    php -f bin/magento setup:cron:run
+fi
 
 # Regenerate frontend assets
-gulp prod
+#gulp prod

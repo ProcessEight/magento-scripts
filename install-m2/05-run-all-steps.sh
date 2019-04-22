@@ -200,6 +200,7 @@ cd $MAGENTO2_ENV_WEBROOT
 # Remove customer access to site (whitelisted IPs can still access frontend/backend)
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:enable
 
+# Apply database changes
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
 # Allow access to site again
@@ -207,21 +208,14 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:disable
 
 echo "
 #
-# 7. Enable developer mode
-#
-"
-cd $MAGENTO2_ENV_WEBROOT
-
-echo "
-#
-# Enable all caches
+# Enabling all caches
 #
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:enable
 
 echo "
 #
-# Enable developer mode
+# Enabling developer mode
 #
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
@@ -229,7 +223,7 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
 if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
     echo "
 #
-# Enable Magento 2 cron
+# Enabling Magento 2 cron
 #
 "
     echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
@@ -238,3 +232,9 @@ if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
     crontab /tmp/magento2-crontab
     $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
+
+echo "
+#
+# Complete. Remember to run mage2tv/cache-clean
+#
+"
