@@ -17,7 +17,7 @@ alias php73='/usr/bin/php7.3'
 # PHP Tools
 #
 alias phpcs='/home/simon/.composer/vendor/bin/phpcs '
-alias comphp72='/usr/bin/php7.2 -v && /usr/bin/php7.2 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi'
+alias composer='/usr/bin/php7.2 -v && /usr/bin/php7.2 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi'
 alias rbm='robo --load-from /var/www/html/magento-scripts/robo/ '
 alias dpd='php -n /home/simon/tools/dephpend '
 alias xdephp56='/var/www/html/magento-scripts/dev/enable-xdebug-php56.sh'
@@ -59,11 +59,17 @@ alias mr1='/usr/bin/php7.1 /var/www/html/n98-magerun.phar --ansi'
 #
 # Magento 2
 #
-alias mm='/usr/bin/php7.1 -f bin/magento -- --ansi'
-alias mr2='/usr/bin/php7.1 /var/www/html/n98-magerun2.phar --ansi'
-alias pes='/usr/bin/php7.1 /var/www/html/pestle.phar'
-alias pestle='/usr/bin/php7.1 /var/www/html/pestle.phar'
+alias mm='/usr/bin/php7.2 -v && /usr/bin/php7.2 -f bin/magento -- --ansi'
+alias mr2='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/n98-magerun2.phar --ansi'
+alias pes='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/pestle.phar'
+alias pestle='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/pestle.phar'
 alias wwwdata='sudo su - www-data -s /bin/bash '
+
+#
+# Magento 2
+# With user check. Not needed on zone8-aurora, but maybe useful on other systems
+#
+alias magento2='cd /var/www && if [ `whoami` == `stat -c '%U' bin/magento` ]; then bin/magento "$@"; else echo "bin/magento should be run as user `stat -c '%U' bin/magento`";fi'
 
 #
 # MySQL
@@ -86,5 +92,3 @@ alias vg='vagrant'
 # Generate TOC for Markdown files
 #
 alias toc='/var/www/html/gh-md-toc'
-
-

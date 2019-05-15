@@ -53,6 +53,7 @@ rm -rf $MAGENTO2_ENV_WEBROOT/var/page_cache/*
 rm -rf $MAGENTO2_ENV_WEBROOT/var/generation/*
 rm -rf $MAGENTO2_ENV_WEBROOT/var/di/*
 rm -rf $MAGENTO2_ENV_WEBROOT/var/tmp/*
+
 echo "
 #
 # Cleaning automated testing sandbox files...
@@ -83,9 +84,11 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush
 echo "
 #
 # Restarting PHP 7.1
+# Restarting PHP 7.2
 #
 "
 sudo service php7.1-fpm restart
+sudo service php7.2-fpm restart
 
 echo "
 #

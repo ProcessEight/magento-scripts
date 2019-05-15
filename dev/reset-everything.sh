@@ -98,14 +98,37 @@ redis-cli -n 2 flushdb
 
 cd $MAGENTO2_ENV_WEBROOT
 
+#echo "
+##
+## $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:clean
+##
+#"
+#$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:clean
 echo "
 #
-# Running bin/magento cache:clean
-# Running bin/magento cache:flush
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:clean
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
+echo "
+#
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
+echo "
+#
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page
+
+#echo "
+#
+# $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar cache:list
+#
+#"
+#$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar cache:list
 
 echo "
 #
@@ -136,12 +159,12 @@ echo "
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
-echo "
+#echo "
 #
 # Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 #
-"
-$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
+#"
+#$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 
 echo "
 #
