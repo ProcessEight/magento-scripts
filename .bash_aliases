@@ -68,8 +68,9 @@ alias wwwdata='sudo su - www-data -s /bin/bash '
 #
 # MySQL
 #
-alias my='mycli -u root --password=MYSqlubuntu'
-alias mydump='mysqldump -u root --password=MYSqlubuntu'
+# Set password using 'export MYSQL_PASSWORD={{mysql_password}}'
+alias my='mycli -u root --password=$MYSQL_PASSWORD'
+alias mydump='mysqldump -u root --password=$MYSQL_PASSWORD'
 
 #
 # Misc
@@ -86,5 +87,3 @@ alias vg='vagrant'
 # Generate TOC for Markdown files
 #
 alias toc='/var/www/html/gh-md-toc'
-
-
