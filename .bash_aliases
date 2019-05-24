@@ -74,8 +74,9 @@ alias magento2='cd /var/www && if [ `whoami` == `stat -c '%U' bin/magento` ]; th
 #
 # MySQL
 #
-alias my='mycli -u root --password=MYSqlubuntu'
-alias mydump='mysqldump -u root --password=MYSqlubuntu'
+# Set password using 'export MYSQL_PASSWORD={{mysql_password}}'
+alias my='mycli -u root --password=$MYSQL_PASSWORD'
+alias mydump='mysqldump -u root --password=$MYSQL_PASSWORD'
 
 #
 # Misc

@@ -47,22 +47,13 @@ if [[ "" == "$COMPOSER_PATH" ]]; then
     exit
 fi
 
-if [[ ! -d ~/.composer/ ]]; then
+if [[ ! -f ~/.composer/auth.json ]]; then
     echo "
 #
-# Adding repo.magento.com access keys to ~/.composer/auth.json...
+# ~/.composer/auth.json does not exist!
+# Add it using 'composer config -g http-basic.repo.magento.com <public_key> <private_key>'
 #
 "
-    mkdir -p ~/.composer/
-
-    echo "{
-       \"http-basic\": {
-          \"repo.magento.com\": {
-             \"username\": \"$MAGENTO2_PUBLIC_KEY\",
-             \"password\": \"$MAGENTO2_PRIVATE_KEY\"
-          }
-       }
-    }" > ~/.composer/auth.json
 fi
 
 echo "
