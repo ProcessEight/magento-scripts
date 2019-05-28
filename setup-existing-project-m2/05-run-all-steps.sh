@@ -1,4 +1,18 @@
 #!/usr/bin/env bash
+
+#
+# Setup an existing project in M2
+#
+# Assumptions
+#
+# Assumes that the project you are trying to setup does not include the M2 source in its repo.
+#
+# Instructions
+#
+# - Run this script first to create a vanilla M2 instance
+# - Then clone your repo and copy the files into the project
+#
+
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/your-project.local/scripts
 # $ ./update/10-prepare-composer.sh
@@ -79,37 +93,37 @@ echo "
 # 30. Prepare Magento 2
 #
 "
-
-if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
-    mkdir -p $MAGENTO2_ENV_WEBROOT
-
-    echo "# Create a new, blank Magento 2 install"
-    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
-else
-    echo "
 #
-# The script has detected that the $MAGENTO2_ENV_WEBROOT directory already exists.
-# The script will not overwrite existing files.
-# To continue, move, rename or delete the $MAGENTO2_ENV_WEBROOT directory.
+#if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
+#    mkdir -p $MAGENTO2_ENV_WEBROOT
 #
-# Script cannot continue. Exiting now.
-"
-    exit
-fi;
-
-cd $MAGENTO2_ENV_WEBROOT
-
-if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
-    echo "
-#
-# The script has detected that the $MAGENTO2_ENV_WEBROOT directory does not exist.
-#
-# To continue, verify permissions and ownership and try again.
-#
-# Script cannot continue. Exiting now.
+#    echo "# Create a new, blank Magento 2 install"
+#    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+#else
+#    echo "
+##
+## The script has detected that the $MAGENTO2_ENV_WEBROOT directory already exists.
+## The script will not overwrite existing files.
+## To continue, move, rename or delete the $MAGENTO2_ENV_WEBROOT directory.
+##
+## Script cannot continue. Exiting now.
 #"
-    exit
-fi
+#    exit
+#fi;
+#
+#cd $MAGENTO2_ENV_WEBROOT
+#
+#if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
+#    echo "
+##
+## The script has detected that the $MAGENTO2_ENV_WEBROOT directory does not exist.
+##
+## To continue, verify permissions and ownership and try again.
+##
+## Script cannot continue. Exiting now.
+##"
+#    exit
+#fi
 
 if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
     echo "
@@ -126,40 +140,25 @@ if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
 fi
 
 chmod u+x bin/magento
-#echo "# Force correct permissions on files"
-#sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
-#echo "# Force correct permissions on directories"
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 775 {} \;
-#echo "# Forcing correct ownership on files..."
-#sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#echo "# Forcing correct ownership on directories..."
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#echo "# Set the sticky bit to ensure that files are generated with the right ownership"
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
 if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
-
 echo "
 #
 # Updating file permissions...
 #
 "
-
     # Make sure we can execute the CLI tool
     chmod u+x bin/magento
-#    echo "# Force correct permissions on files"
-#    sudo find var generated pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-#    echo "# Force correct permissions on directories"
-#    sudo find var generated pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-#    echo "# Forcing correct ownership on files..."
-#    sudo find var generated pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#    echo "# Forcing correct ownership on directories..."
-#    sudo find var generated pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
-    sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
-    sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-    echo "# Ensure a clean slate by flushing selected directories..."
-    sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
+    # Force correct permissions on files
+    sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+    # Force correct permissions on directories
+    sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+    # Force correct ownership on files
+    sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+    # Force correct ownership on directories
+    sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+    # Set the group-id bit to ensure that files and directories are generated with the right ownership
+    sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 fi
 
 echo "

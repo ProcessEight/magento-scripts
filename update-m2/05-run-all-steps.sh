@@ -19,8 +19,7 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
     echo "
 #
 # Could not detect config-m2.env.
-# Create one first in $PROJECT_ROOT_PATH/config-m2.env
-# and make sure you are running this script from the scripts directory.
+# Create one first in $PROJECT_ROOT_PATH/config-m2.env and make sure you are running this script from the scripts directory.
 #
 # Script cannot continue. Exiting now.
 #"
@@ -49,23 +48,18 @@ if [[ "" == "$COMPOSER_CMD" ]]; then
 exit
 fi
 
-#if [[ ! -f ~/.composer/auth.json ]]; then
-#    echo "
-##
-## Adding repo.magento.com access keys to ~/.composer/auth.json...
-##
-#"
-#    mkdir -p ~/.composer/
+if [[ ! -f ~/.composer/auth.json ]]; then
+    echo "
 #
-#    echo "{
-#       \"http-basic\": {
-#          \"repo.magento.com\": {
-#             \"username\": \"$MAGENTO2_PUBLIC_KEY\",
-#             \"password\": \"$MAGENTO2_PRIVATE_KEY\"
-#          }
-#       }
-#    }" > ~/.composer/auth.json
-#fi
+# The script has detected that ~/.composer/auth.json does not exist.
+# The script will not create it.
+# To continue, create it first using:
+# $ composer config -g http-basic.repo.magento.com <public_key> <private_key>
+#
+# Script cannot continue. Exiting now.
+#"
+    exit
+fi
 
 echo "
 #
@@ -79,20 +73,20 @@ fi
 
 if [[ $MAGENTO2_DB_RESET == true ]]; then
     echo "# Remove existing database"
-    echo "# DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME"
+#    echo "# DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME"
 
     echo "# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step"
     echo "# This prevents MySQL from issuing an error if the user does not exist"
-    echo "# GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
-    echo "# DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+#    echo "# GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+#    echo "# DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
 
     echo "# Create new database and user"
-    echo "# CREATE DATABASE $MAGENTO2_DB_NAME"
-    echo "# CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
-    echo "# GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+#    echo "# CREATE DATABASE $MAGENTO2_DB_NAME"
+#    echo "# CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+#    echo "# GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE DATABASE $MAGENTO2_DB_NAME"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
@@ -113,23 +107,55 @@ echo "
 # Reads the composer.lock file and installs/updates all dependencies to the specified version
 $MAGENTO2_ENV_COMPOSERCOMMAND install
 
+#if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
+#
+#echo "
+##
+## Updating file permissions...
+##
+#"
+#
+#    # Make sure we can execute the CLI tool
+#    chmod u+x bin/magento
+#    # Force correct permissions on files
+#    sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+#    # Force correct permissions on directories
+#    sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+#    # Force correct ownership on files
+#    sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+#    # Force correct ownership on directories
+#    sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+#    # Set the group-id bit to ensure that files and directories are generated with the right ownership
+#    sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+#fi
+
 if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
+
+echo "
+#
+# Updating file permissions...
+#
+"
+
     # Make sure we can execute the CLI tool
     chmod u+x bin/magento
-    # Force correct permissions on files
-    sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-    # Force correct permissions on directories
-    sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-    # Force correct ownership on files
-    sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    # Force correct ownership on directories
-    sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    # Set the group-id bit to ensure that files and directories are generated with the right ownership
-    sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+#    echo "# Force correct permissions on files"
+#    sudo find var generated pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+#    echo "# Force correct permissions on directories"
+#    sudo find var generated pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+#    echo "# Forcing correct ownership on files..."
+#    sudo find var generated pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+#    echo "# Forcing correct ownership on directories..."
+#    sudo find var generated pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+    echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
+    sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
+    sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+    echo "# Ensure a clean slate by flushing selected directories..."
+    sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
 fi
 
-# Ensure the application is installed (especially if we re-imported the database)
-php -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
+# Ensure the application is installed correctly (especially if we re-imported the database)
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
 --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
 --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
@@ -145,7 +171,7 @@ rm -rf var/generation/* var/di/* generated/*
 #$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
 
 # Make sure we're running in developer mode
-php -f bin/magento deploy:mode:set developer
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
@@ -171,33 +197,53 @@ echo "
 "
 
 # Disable customer access to site (whitelisted IPs can still access frontend/backend)
-php -f bin/magento maintenance:enable
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:enable
 
 # Upgrade the database, run setup scripts of all modules
-php -f bin/magento setup:upgrade
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
 # Allow access to site again
-php -f bin/magento maintenance:disable
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:disable
 
 echo "
 #
-# 70. Set environment settings
+# 70. Apply environment-specific settings
 #
 "
 
-# Enable all caches
-php -f bin/magento cache:enable
+echo "
+#
+# Enabling all caches
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:enable
+
+
+echo "
+#
+# Disabling full_page cache
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
+
+echo "
+#
+# Enabling developer mode
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
 
 # Enable Magento 2 cron
 if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
     touch $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log
     touch $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log
     touch $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" > /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" >> /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/php $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" >> /tmp/magento2-crontab
+    echo "* * * * * $MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" >> $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" > /tmp/magento2-crontab
+    echo "* * * * * $MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/update/cron.php >> $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" >> /tmp/magento2-crontab
+    echo "* * * * * $MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run >> $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" >> /tmp/magento2-crontab
     crontab /tmp/magento2-crontab
-    php -f bin/magento setup:cron:run
+    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
 
 # Regenerate frontend assets

@@ -36,9 +36,17 @@ set -a; . `pwd`/config-m2.env
 sudo rm -f /etc/nginx/sites-enabled/$MAGENTO2_ENV_HOSTNAME
 sudo rm -f /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME
 
+echo "
+#
+# Creating new nginx vhost...
+#
+"
+sudo cp -f $MAGENTO2_ENV_WEBROOT/nginx.conf.sample $MAGENTO2_ENV_WEBROOT/nginx.conf.local
+nano $MAGENTO2_ENV_WEBROOT/nginx.conf.local
+
 sudo echo "# Uncomment this if you don't already have a fastcgi_backend defined
 #upstream fastcgi_backend {
-#        server  unix:/run/php/php7.1-fpm.sock;
+#        server  unix:/run/php/php7.2-fpm.sock;
 #}
 
 server {
@@ -46,12 +54,33 @@ server {
         server_name www.$MAGENTO2_ENV_HOSTNAME $MAGENTO2_ENV_HOSTNAME;
         set \$MAGE_ROOT $MAGENTO2_ENV_WEBROOT;
         set \$MAGE_MODE developer;
-        include $MAGENTO2_ENV_WEBROOT/nginx.conf.sample;
+        include $MAGENTO2_ENV_WEBROOT/nginx.conf.local;
 }
 " >> /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME
 
+echo "
+#
+# Sym-linking vhost to /etc/nginx/sites-enabled...
+#
+"
 sudo ln -s /etc/nginx/sites-available/$MAGENTO2_ENV_HOSTNAME /etc/nginx/sites-enabled/
 
+echo "
+#
+# Adding entry to /etc/hosts...
+#
+"
 sudo echo "127.0.0.1       www.$MAGENTO2_ENV_HOSTNAME $MAGENTO2_ENV_HOSTNAME" >> /etc/hosts
 
+echo "
+#
+# Restarting nginx...
+#
+"
 sudo service nginx restart
+
+echo "
+#
+# Setup complete. You should now be able to visit www.$MAGENTO2_ENV_HOSTNAME or $MAGENTO2_ENV_HOSTNAME in a browser.
+#
+"
