@@ -37,9 +37,10 @@ alias xddphp73='/var/www/html/magento-scripts/dev/disable-xdebug-php73.sh'
 alias wwwd='cd /var/www/html/'
 alias wwwm2r='cd /var/www/html/m2-research/'
 alias wwwm23='cd /var/www/html/m23-example-modules/htdocs/'
-
 alias wwwmem='cd /var/www/html/magento225-example-modules/htdocs/'
 alias wwwws='cd /var/www/html/watson/watson-safari/'
+
+alias wwwjt='cd /var/www/html/jacobs-turner/'
 
 alias wwwa='cd /var/www/html/ansible/'
 alias wwwdm2='cd /var/www/html/dlxm2/html/'
@@ -70,7 +71,7 @@ alias magento2='cd /var/www && if [ `whoami` == `stat -c '%U' bin/magento` ]; th
 #
 # MySQL
 #
-# Set password using 'export MYSQL_PASSWORD={{mysql_password}}'
+# Set password using 'export MYSQL_PASSWORD={{mysql_password_goes_here}}'
 alias my='mycli -u root --password=$MYSQL_PASSWORD'
 alias mydump='mysqldump -u root --password=$MYSQL_PASSWORD'
 
