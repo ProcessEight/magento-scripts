@@ -2,8 +2,41 @@
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/your-project.local/scripts
 # $ ./update/10-prepare-composer.sh
+CONFIG_M2_FILEPATH=`pwd`/config-m2.env
+PROJECT_ROOT_PATH=`pwd`
+if [[ 'scripts' != ${PROJECT_ROOT_PATH: -7} ]]; then
+    echo "
+#
+# The script detected you are running this script from an invalid location.
+# Make sure you are running this script from the scripts directory.
+# The script detected $PROJECT_ROOT_PATH
+#
+# Script cannot continue. Exiting now.
+#"
+exit
+fi
+if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
+    echo "
+#
+# Could not detect config-m2.env.
+# Create one first in $PROJECT_ROOT_PATH/config-m2.env
+# and make sure you are running this script from the scripts directory.
+#
+# Script cannot continue. Exiting now.
+#"
+    exit
+fi
 set -a; . `pwd`/config-m2.env
 
+#
+# Script-specific logic starts here
+#
+
+echo "
+#
+# 20. Prepare database
+#
+"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
 
 # Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step

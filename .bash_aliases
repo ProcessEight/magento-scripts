@@ -36,19 +36,15 @@ alias xddphp73='/var/www/html/magento-scripts/dev/disable-xdebug-php73.sh'
 #
 alias wwwd='cd /var/www/html/'
 alias wwwm2r='cd /var/www/html/m2-research/'
+alias wwwm23='cd /var/www/html/m23-example-modules/htdocs/'
 
 alias wwwmem='cd /var/www/html/magento225-example-modules/htdocs/'
 alias wwwws='cd /var/www/html/watson/watson-safari/'
 
-alias wwwdfl='cd /var/www/html/dfl/htdocs'
-alias wwwdfl167='cd /var/www/html/dfl-167/htdocs'
-alias wwweed='cd /var/www/html/eed-eel-datatech/'
-alias wwweeg='cd /var/www/html/eeg-eel-greentech/'
-alias wwwhat='cd /var/www/html/hat/htdocs'
-alias wwwll='cd /var/www/html/ll/htdocs'
-alias wwwmor='cd /var/www/html/mor/htdocs'
-alias wwwnsi='cd /var/www/html/nsi-nails-systems-international/htdocs'
-alias wwwwsp='cd /var/www/html/wsp-weather-stop/htdocs'
+alias wwwa='cd /var/www/html/ansible/'
+alias wwwdm2='cd /var/www/html/dlxm2/html/'
+alias wwwtm2='cd /var/www/html/trespass-m2/html/'
+alias wwwtpwa='cd /var/www/html/trespass-pwa/pwa-studio/'
 
 #
 # Magento 1

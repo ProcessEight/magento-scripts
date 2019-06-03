@@ -270,6 +270,14 @@ fi
 
 echo "
 #
+# Now that we've generated all the possible classes that could exist,
+# generate an optimised composer class map that supports faster autoloading
+#
+"
+$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
+
+echo "
+#
 # Complete. Remember to run mage2tv/cache-clean
 #
 "
