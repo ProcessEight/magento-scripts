@@ -43,10 +43,10 @@ alias wwwws='cd /var/www/html/watson/watson-safari/'
 alias wwwj='cd /var/www/html/jacobs-turner/'
 alias wwwjt='cd /var/www/html/jacobs-turner/'
 
-alias wwwa='cd /var/www/html/ansible/'
-alias wwwdm2='cd /var/www/html/dlxm2/html/'
-alias wwwtm2='cd /var/www/html/trespass-m2/html/'
-alias wwwtpwa='cd /var/www/html/trespass-pwa/pwa-studio/'
+alias wwwa='cd /var/www/html/jacobs-turner/ansible/'
+alias wwwdm2='cd /var/www/html/jacobs-turner/dlxm2/html/'
+alias wwwtm2='cd /var/www/html/jacobs-turner/trespass-m2/html/'
+alias wwwtpwa='cd /var/www/html/jacobs-turner/trespass-pwa/pwa-studio/'
 
 #
 # Magento 1
