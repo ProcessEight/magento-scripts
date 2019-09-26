@@ -35,18 +35,17 @@ alias xddphp73='/var/www/html/magento-scripts/dev/disable-xdebug-php73.sh'
 # Projects
 #
 alias wwwd='cd /var/www/html/'
-alias wwwm2r='cd /var/www/html/m2-research/'
-alias wwwm23='cd /var/www/html/m2-research/m23-example-modules/htdocs/'
-alias wwwmem='cd /var/www/html/magento225-example-modules/htdocs/'
-alias wwwws='cd /var/www/html/watson/watson-safari/'
+alias m2r='cd /var/www/html/m2-research/'
+alias m23='cd /var/www/html/m2-research/m23-example-modules/htdocs/'
+alias m22='cd /var/www/html/magento225-example-modules/htdocs/'
+alias ws='cd /var/www/html/watson/watson-safari/'
 
-alias wwwj='cd /var/www/html/jacobs-turner/'
-alias wwwjt='cd /var/www/html/jacobs-turner/'
+alias jt='cd /var/www/html/jacobs-turner/'
 
-alias wwwa='cd /var/www/html/jacobs-turner/ansible/'
-alias wwwdm2='cd /var/www/html/jacobs-turner/dlxm2/html/'
-alias wwwtm2='cd /var/www/html/jacobs-turner/trespass-m2/html/'
-alias wwwtpwa='cd /var/www/html/jacobs-turner/trespass-pwa/pwa-studio/'
+alias ans='cd /var/www/html/jacobs-turner/ansible/'
+alias dm2='cd /var/www/html/jacobs-turner/dlxm2/html/'
+alias tm2='cd /var/www/html/jacobs-turner/trespass-m2/html/'
+alias tpwa='cd /var/www/html/jacobs-turner/trespass-pwa/pwa-studio/'
 
 #
 # Magento 1
