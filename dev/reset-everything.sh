@@ -112,7 +112,9 @@ echo "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
 echo "
 #
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
+# Enable all caches except full_page
+#
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
 #
 "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
@@ -132,11 +134,12 @@ $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full
 
 echo "
 #
-# Restarting PHP 7.1 and 7.2
+# Restarting $MAGENTO2_ENV_PHPCOMMAND
 #
 "
 #sudo service php7.1-fpm restart
-sudo service php7.2-fpm restart
+#sudo service php7.2-fpm restart
+sudo service php7.3-fpm restart
 
 echo "
 #
@@ -159,12 +162,12 @@ echo "
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
-echo "
-
- Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
-
-"
-$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
+#echo "
+#
+# Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
+#
+#"
+#$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 
 echo "
 #
