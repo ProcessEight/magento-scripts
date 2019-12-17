@@ -117,7 +117,9 @@ echo "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
 echo "
 #
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
+# Enable all caches except full_page
+#
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
 #
 "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
@@ -137,7 +139,7 @@ $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full
 
 echo "
 #
-# Restarting PHP 7.2 and 7.3
+# Restarting $MAGENTO2_ENV_PHPCOMMAND
 #
 "
 #sudo service php7.1-fpm restart
