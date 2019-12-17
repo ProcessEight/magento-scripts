@@ -17,7 +17,7 @@ alias php73='/usr/bin/php7.3'
 # PHP Tools
 #
 alias phpcs='~/.composer/vendor/bin/phpcs '
-alias composer='/usr/bin/php7.2 -v && /usr/bin/php7.2 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi'
+alias composer='/usr/bin/php7.3 -v && /usr/bin/php7.3 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi'
 alias rbm='robo --load-from /var/www/html/magento-scripts/robo/ '
 alias dpd='php -n ~/tools/dephpend '
 alias xdephp56='/var/www/html/magento-scripts/dev/enable-xdebug-php56.sh'
@@ -45,6 +45,9 @@ alias jt='cd /var/www/html/jacobs-turner/'
 alias ans='cd /var/www/html/jacobs-turner/ansible/'
 alias dm2='cd /var/www/html/jacobs-turner/dlxm2/html/'
 alias tm2='cd /var/www/html/jacobs-turner/trespass-m2/html/'
+alias tm2pr='cd /var/www/html/jacobs-turner/projects/trespass-m2-pr-pull-request-code-review/html/'
+alias jtp='cd /var/www/html/jacobs-turner/projects/'
+alias jtm='cd /var/www/html/jacobs-turner/modules/'
 alias tpwa='cd /var/www/html/jacobs-turner/trespass-pwa/pwa-studio/'
 
 #
@@ -58,6 +61,7 @@ alias mr1='/usr/bin/php7.1 /var/www/html/n98-magerun.phar --ansi'
 #
 alias mm='/usr/bin/php7.2 -v && /usr/bin/php7.2 -f bin/magento -- --ansi'
 alias mr2='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/n98-magerun2.phar --ansi'
+alias mr23='/usr/bin/php7.3 -v && /usr/bin/php7.3 /var/www/html/n98-magerun2.phar --ansi'
 alias pes='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/pestle.phar'
 alias pestle='/usr/bin/php7.2 -v && /usr/bin/php7.2 /var/www/html/pestle.phar'
 alias wwwdata='sudo su - www-data -s /bin/bash '

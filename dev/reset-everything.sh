@@ -4,6 +4,7 @@
 # $ ./update/10-prepare-composer.sh
 CONFIG_M2_FILEPATH=`pwd`/config-m2.env
 PROJECT_ROOT_PATH=`pwd`
+# Check we are in the right directory
 if [[ 'scripts' != ${PROJECT_ROOT_PATH: -7} ]]; then
     echo "
 #
@@ -13,8 +14,10 @@ if [[ 'scripts' != ${PROJECT_ROOT_PATH: -7} ]]; then
 #
 # Script cannot continue. Exiting now.
 #"
-exit
+  exit
 fi
+
+# Check that config file exists
 if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
     echo "
 #
@@ -24,15 +27,17 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
 #
 # Script cannot continue. Exiting now.
 #"
-exit
+  exit
 fi
+
+# Load config variables
 set -a; . `pwd`/config-m2.env
 
 #
 # Script-specific logic starts here
 #
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit # Exit if 'cd' command fails
 
 echo "
 #
@@ -132,11 +137,12 @@ $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full
 
 echo "
 #
-# Restarting PHP 7.1 and 7.2
+# Restarting PHP 7.2 and 7.3
 #
 "
 #sudo service php7.1-fpm restart
-sudo service php7.2-fpm restart
+#sudo service php7.2-fpm restart
+sudo service php7.3-fpm restart
 
 echo "
 #
@@ -159,12 +165,12 @@ echo "
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
-echo "
-
- Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
-
-"
-$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
+#echo "
+#
+# Running $MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
+#
+#"
+#$MAGENTO2_ENV_PHPCOMMAND /var/www/html/n98-magerun2.phar sys:setup:downgrade-versions
 
 echo "
 #
