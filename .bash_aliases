@@ -7,11 +7,11 @@ alias dc='/usr/local/bin/docker-compose'
 #
 # PHP
 #
-alias php56='/usr/bin/php5.6'
-alias php70='/usr/bin/php7.0'
-alias php71='/usr/bin/php7.1'
-alias php72='/usr/bin/php7.2'
-alias php73='/usr/bin/php7.3'
+alias php56='/usr/bin/php5.6 -v && /usr/bin/php5.6'
+alias php70='/usr/bin/php7.0 -v && /usr/bin/php7.0'
+alias php71='/usr/bin/php7.1 -v && /usr/bin/php7.1'
+alias php72='/usr/bin/php7.2 -v && /usr/bin/php7.2'
+alias php73='/usr/bin/php7.3 -v && /usr/bin/php7.3'
 
 #
 # PHP Tools
@@ -43,8 +43,8 @@ alias ws='cd /var/www/html/watson/watson-safari/'
 alias jt='cd /var/www/html/jacobs-turner/'
 
 alias ans='cd /var/www/html/jacobs-turner/ansible/'
-alias dm2='cd /var/www/html/jacobs-turner/dlxm2/html/'
-alias tm2='cd /var/www/html/jacobs-turner/trespass-m2/html/'
+alias dm2='cd /var/www/html/jacobs-turner/projects/dlxm2/html/'
+alias tm2='cd /var/www/html/jacobs-turner/projects/trespass-m2/html/'
 alias tm2pr='cd /var/www/html/jacobs-turner/projects/trespass-m2-pr-pull-request-code-review/html/'
 alias jtp='cd /var/www/html/jacobs-turner/projects/'
 alias jtm='cd /var/www/html/jacobs-turner/modules/'
@@ -94,3 +94,8 @@ alias vg='vagrant'
 # Generate TOC for Markdown files
 #
 alias toc='/var/www/html/gh-md-toc'
+
+#
+# Java
+#
+export JAVA_HOME=/usr/bin/java

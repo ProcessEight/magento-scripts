@@ -5,7 +5,7 @@
 #
 # Assumptions
 #
-# Assumes that the project you are trying to setup does not include the M2 source in its repo.
+# Assumes that the project you are trying to setup DOES include the M2 source in its repo.
 #
 # Instructions
 #
@@ -40,27 +40,6 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
 #"
     exit
 fi
-set -a; . `pwd`/config-m2.env
-
-echo "
-#
-# 10. Prepare composer
-#
-"
-
-COMPOSER_PATH=$(which composer)
-if [[ "" == "$COMPOSER_PATH" ]]; then
-    echo "
-#
-# The script has detected that Composer is not installed.
-# The script does not have permissions to install it.
-# To continue, install Composer first
-#
-# Script cannot continue. Exiting now.
-#"
-    exit
-fi
-
 if [[ ! -f ~/.composer/auth.json ]]; then
     echo "
 #
@@ -74,64 +53,89 @@ if [[ ! -f ~/.composer/auth.json ]]; then
     exit
 fi
 
-echo "
-#
-# 20. Prepare database
-#
-"
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
+# Import config variables
+set -a; . `pwd`/config-m2.env
 
-# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step
-# This prevents MySQL from issuing an error if the user does not exist
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+if $MAGENTO2_DB_RESET; then
 
-echo "
-#
-# Importing $MAGENTO2_DB_DUMPNAME into $MAGENTO2_DB_NAME
-#
-"
+    echo "#"
+    echo "# Prepare database"
+    echo "#"
 
-pv $MAGENTO2_DB_DUMPNAME | mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME
+    echo "#"
+    echo "# Running query: DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
+
+    echo "#"
+    echo "# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step"
+    echo "# This prevents MySQL from issuing an error if the user does not exist"
+    echo "# Running query: GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+
+    echo "#"
+    echo "# Running query: DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+
+    echo "#"
+    echo "# Running query: CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+
+    echo "#"
+    echo "# Running query: GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+
+    echo "#"
+    echo "# Avoid the 'show_compatibility_56' error"
+    echo "#"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "SET global show_compatibility_56 = on"
+fi
+
+if $MAGENTO2_DB_IMPORT; then
+    echo "#"
+    echo "# Processing db backup"
+    echo "#"
+
+    echo "# Create a new db dump file in the M2 var directory"
+    cd $MAGENTO2_ENV_WEBROOT/var/
+
+    echo "# Concat the uncompressed db structure dump into the above file"
+    pbzip2 -dc tredm2_magdev_structure.sql.bz2 >> db.sql || exit
+
+    echo "# Concat the uncompressed db data dump into the above file"
+    pbzip2 -dc tredm2_magdev_data.sql.bz2 >> db.sql || exit
+
+    echo "# Switch back to M2 root (where the mage2-dbdump.sh script should be)"
+    cd $MAGENTO2_ENV_WEBROOT
+
+    echo "# Update definers"
+    sed -i 's/`tredm2_magdev`@`172.16.%`/CURRENT_USER/g' $MAGENTO2_ENV_WEBROOT/var/db.sql
+
+    echo "#"
+    echo "# Restoring database using mage2-dbdump.sh"
+    echo "#"
+
+    ./mage2-dbdump.sh -r || exit
+
+    # Update the URLs
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 'http://$MAGENTO2_ENV_HOSTNAME/' WHERE value = 'https://m2.t-pass.co.uk/'"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 'http://$MAGENTO2_ENV_HOSTNAME/us/' WHERE value = 'https://m2.t-pass.co.uk/us/'"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 'http://$MAGENTO2_ENV_HOSTNAME/row/' WHERE value = 'https://m2.t-pass.co.uk/row/'"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 'http://$MAGENTO2_ENV_HOSTNAME/pl/' WHERE value = 'https://m2.t-pass.co.uk/pl/'"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 0 WHERE path = 'web/secure/use_in_frontend'"
+    mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 0 WHERE path = 'web/secure/use_in_adminhtml'"
+
+fi
 
 echo "
 #
 # 30. Prepare Magento 2
 #
 "
-#
-#if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
-#    mkdir -p $MAGENTO2_ENV_WEBROOT
-#
-#    echo "# Create a new, blank Magento 2 install"
-#    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
-#else
-#    echo "
-##
-## The script has detected that the $MAGENTO2_ENV_WEBROOT directory already exists.
-## The script will not overwrite existing files.
-## To continue, move, rename or delete the $MAGENTO2_ENV_WEBROOT directory.
-##
-## Script cannot continue. Exiting now.
-#"
-#    exit
-#fi;
-#
-#cd $MAGENTO2_ENV_WEBROOT
-#
-#if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
-#    echo "
-##
-## The script has detected that the $MAGENTO2_ENV_WEBROOT directory does not exist.
-##
-## To continue, verify permissions and ownership and try again.
-##
-## Script cannot continue. Exiting now.
-##"
-#    exit
-#fi
 
 if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
     echo "
@@ -177,7 +181,7 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-$MAGENTO2_ENV_COMPOSERCOMMAND install
+$MAGENTO2_ENV_COMPOSERCOMMAND install || exit
 
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
@@ -185,39 +189,6 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:install --base-url=http://$MAGENTO
 --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
 --currency=$MAGENTO2_LOCALE_CURRENCY --timezone=$MAGENTO2_LOCALE_TIMEZONE --use-rewrites=$MAGENTO2_ENV_USEREWRITES --backend-frontname=$MAGENTO2_ADMIN_FRONTNAME --admin-use-security-key=$MAGENTO2_ENV_USESECURITYKEY \
 --session-save=$MAGENTO2_ENV_SESSIONSAVE $MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE
-
-echo "
-#
-# 50. Setup Magento 2
-#
-"
-
-#
-# Code generation (PRODUCTION MODE ONLY)
-#
-#if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
-#then
-    # For multisites running Magento 2.0.x only
-#    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:di:compile-multi-tenant
-#else
-#    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:di:compile
-#fi
-# Now that we've generated all the possible classes that could exist,
-# generate an optimised composer class map that supports faster autoloading
-#$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
-
-# Static content generation
-# There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
-# So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
-#rm -rf pub/static/*
-#export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
-# Exclude configured themes
-#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
-#    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-#fi
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento $DEPLOY_COMMAND
-# Generate static assets for Admin theme
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
 echo "
 #
@@ -234,12 +205,6 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
 # Allow access to site again
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:disable
-
-echo "
-#
-# 70. Apply environment-specific settings
-#
-"
 
 echo "
 #

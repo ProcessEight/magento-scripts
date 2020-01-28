@@ -125,17 +125,8 @@ if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
     exit
 fi
 
+# Make sure we can execute the CLI tool
 chmod u+x bin/magento
-#echo "# Force correct permissions on files"
-#sudo find var vendor pub/static pub/media app/etc -type f -exec chmod 775 {} \;
-#echo "# Force correct permissions on directories"
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod 775 {} \;
-#echo "# Forcing correct ownership on files..."
-#sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#echo "# Forcing correct ownership on directories..."
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#echo "# Set the sticky bit to ensure that files are generated with the right ownership"
-#sudo find var vendor pub/static pub/media app/etc -type d -exec chmod g+s {} \;
 
 if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
 
@@ -144,17 +135,14 @@ echo "
 # Updating file permissions...
 #
 "
-
-    # Make sure we can execute the CLI tool
-    chmod u+x bin/magento
-#    echo "# Force correct permissions on files"
-#    sudo find var generated pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-#    echo "# Force correct permissions on directories"
-#    sudo find var generated pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-#    echo "# Forcing correct ownership on files..."
-#    sudo find var generated pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-#    echo "# Forcing correct ownership on directories..."
-#    sudo find var generated pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+    # echo "# Force correct permissions on files"
+    # sudo find var generated pub/static pub/media app/etc -type f -exec chmod u+w {} \;
+    # echo "# Force correct permissions on directories"
+    # sudo find var generated pub/static pub/media app/etc -type d -exec chmod u+w {} \;
+    # echo "# Forcing correct ownership on files..."
+    # sudo find var generated pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
+    # echo "# Forcing correct ownership on directories..."
+    # sudo find var generated pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
     echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
     sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
     sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
@@ -183,30 +171,6 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-#
-# Code generation (PRODUCTION MODE ONLY)
-#
-#if [[ $MAGENTO2_ENV_MULTITENANT == true ]];
-#then
-    # For multisites running Magento 2.0.x only
-#    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:di:compile-multi-tenant
-#else
-#    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:di:compile
-#fi
-# Now that we've generated all the possible classes that could exist,
-# generate an optimised composer class map that supports faster autoloading
-#$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
-
-# Static content generation
-# There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
-# So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
-#rm -rf pub/static/*
-#export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
-# Exclude configured themes
-#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
-#    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-#fi
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento $DEPLOY_COMMAND
 # Generate static assets for Admin theme
 #$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
 
@@ -233,33 +197,25 @@ echo "
 "
 
 echo "
-#
 # Enabling all caches
-#
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:enable
 
 
 echo "
-#
 # Disabling full_page cache
-#
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
 
 echo "
-#
 # Enabling developer mode
-#
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
 
 if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
     echo "
-#
 # Enabling Magento 2 cron
-#
 "
     echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
     echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab

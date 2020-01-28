@@ -114,7 +114,7 @@ echo "
 # $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush || exit
 echo "
 #
 # Enable all caches except full_page

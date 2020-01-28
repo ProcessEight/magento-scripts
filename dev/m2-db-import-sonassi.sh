@@ -39,24 +39,36 @@ echo "
 # Prepare database
 #
 "
+    echo "#"
     echo "# Running query: DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
 
-    # Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step
-    # This prevents MySQL from issuing an error if the user does not exist
+    echo "#"
+    echo "# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step"
+    echo "# This prevents MySQL from issuing an error if the user does not exist"
     echo "# Running query: GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
 
+    echo "#"
     echo "# Running query: DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
 
+    echo "#"
     echo "# Running query: CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
 
+    echo "#"
     echo "# Running query: GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
 
+    echo "#"
     echo "# Avoid the 'show_compatibility_56' error"
+    echo "#"
     mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "SET global show_compatibility_56 = on"
 fi
 
@@ -72,10 +84,10 @@ echo "# Create a new db dump file in the M2 var directory"
 cd $MAGENTO2_ENV_WEBROOT/var/
 
 echo "# Concat the uncompressed db structure dump into the above file"
-pbzip2 -dc tredm2_magdev_structure.sql.bz2 >> db.sql
+pbzip2 -dc tredm2_magdev_structure.sql.bz2 >> db.sql || exit
 
 echo "# Concat the uncompressed db data dump into the above file"
-pbzip2 -dc tredm2_magdev_data.sql.bz2 >> db.sql
+pbzip2 -dc tredm2_magdev_data.sql.bz2 >> db.sql || exit
 
 echo "# Switch back to M2 root (where the mage2-dbdump.sh script should be)"
 cd $MAGENTO2_ENV_WEBROOT
@@ -89,7 +101,7 @@ echo "
 #
 "
 
-./mage2-dbdump.sh -r
+./mage2-dbdump.sh -r || exit
 
 # Update the URLs
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD $MAGENTO2_DB_NAME -e "UPDATE core_config_data SET value = 'http://$MAGENTO2_ENV_HOSTNAME/' WHERE value = 'https://m2.t-pass.co.uk/'"
