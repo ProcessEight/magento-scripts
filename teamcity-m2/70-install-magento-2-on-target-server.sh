@@ -31,16 +31,11 @@ sudo -u administrator php -f bin/magento setup:install --base-url=http://%env.MA
 --currency=%env.MAGENTO2_LOCALE_CURRENCY% --timezone=%env.MAGENTO2_LOCALE_TIMEZONE% --use-rewrites=%env.MAGENTO2_ENV_USEREWRITES% --backend-frontname=%env.MAGENTO2_ADMIN_FRONTNAME% --admin-use-security-key=%env.MAGENTO2_ENV_USESECURITYKEY% \
 --session-save=%env.MAGENTO2_ENV_SESSIONSAVE% %env.MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE%
 
-echo "# Force correct permissions on files"
-sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-echo "# Force correct permissions on directories"
-sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-echo "# Force correct ownership on files"
-sudo find var vendor pub/static pub/media app/etc -type f -exec chown %env.MAGENTO2_ENV_CLIUSER%:%env.MAGENTO2_ENV_WEBSERVERGROUP% {} \;
-echo "# Force correct ownership on directories"
-sudo find var vendor pub/static pub/media app/etc -type d -exec chown %env.MAGENTO2_ENV_CLIUSER%:%env.MAGENTO2_ENV_WEBSERVERGROUP% {} \;
-echo "# Set the set-group-uid bit to ensure that directories are generated with the right ownership"
-sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
+sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
+sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+echo "# Ensure a clean slate by flushing selected directories..."
+sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
 
 sudo -u administrator php -f bin/magento module:enable --all
 

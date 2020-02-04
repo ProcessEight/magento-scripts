@@ -152,6 +152,8 @@ if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
 fi
 
 cd $MAGENTO2_ENV_WEBROOT
+
+# Make sure we can execute the CLI tool
 chmod u+x bin/magento
 
 if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
@@ -160,18 +162,11 @@ echo "
 # Updating file permissions...
 #
 "
-    # Make sure we can execute the CLI tool
-    chmod u+x bin/magento
-    # Force correct permissions on files
-    sudo find var vendor pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-    # Force correct permissions on directories
-    sudo find var vendor pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-    # Force correct ownership on files
-    sudo find var vendor pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    # Force correct ownership on directories
-    sudo find var vendor pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    # Set the group-id bit to ensure that files and directories are generated with the right ownership
-    sudo find var pub/static pub/media app/etc -type d -exec chmod g+s {} \;
+    echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
+    sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
+    sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
+    echo "# Ensure a clean slate by flushing selected directories..."
+    sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
 fi
 
 echo "
