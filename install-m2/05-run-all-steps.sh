@@ -152,7 +152,7 @@ fi
 
 echo "
 #
-# 40. Install Magento 2
+# 40. Install Magento $MAGENTO2_ENV_EDITION $MAGENTO2_ENV_VERSION
 #
 "
 cd $MAGENTO2_ENV_WEBROOT
@@ -181,10 +181,10 @@ echo "
 "
 cd $MAGENTO2_ENV_WEBROOT
 
-# Remove customer access to site (whitelisted IPs can still access frontend/backend)
+# Disable customer access to site (whitelisted IPs can still access frontend/backend)
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:enable
 
-# Apply database changes
+# Upgrade the database, run setup scripts of all modules
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
 
 # Allow access to site again

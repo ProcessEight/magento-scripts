@@ -36,7 +36,7 @@ alias xddphp73='/var/www/html/magento-scripts/dev/disable-xdebug-php73.sh'
 #
 alias wwwd='cd /var/www/html/'
 alias m2r='cd /var/www/html/m2-research/'
-alias m23='cd /var/www/html/m2-research/m23-example-modules/htdocs/'
+alias m23='cd /var/www/html/m2-research/m23-example-modules/html/'
 alias m22='cd /var/www/html/magento225-example-modules/htdocs/'
 alias ws='cd /var/www/html/watson/watson-safari/'
 

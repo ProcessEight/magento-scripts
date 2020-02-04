@@ -218,5 +218,16 @@ if [[ $MAGENTO2_ENV_ENABLECRON ]]; then
     $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
 
-# Regenerate frontend assets
-#gulp prod
+echo "
+#
+# Now that we've generated all the possible classes that could exist,
+# generate an optimised composer class map that supports faster autoloading
+#
+"
+$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
+
+echo "
+#
+# Complete. Remember to run mage2tv/cache-clean
+#
+"
