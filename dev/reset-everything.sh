@@ -101,7 +101,7 @@ redis-cli -n 1 flushdb
 redis-cli -n 2 flushdb
 #echo "Skipping redis flushdb "
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 #echo "
 ##
@@ -117,12 +117,20 @@ echo "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush || exit
 echo "
 #
-# Enable all caches except full_page
+# Enable all caches except full_page and vertex
 #
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate vertex
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate
+#echo "
+#
+# Enable vertex cache
+#
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable vertex
+#
+#"
+#$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable vertex
 echo "
 #
 # $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page

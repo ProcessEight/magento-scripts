@@ -17,7 +17,7 @@ alias php73='/usr/bin/php7.3 -v && /usr/bin/php7.3'
 # PHP Tools
 #
 alias phpcs='~/.composer/vendor/bin/phpcs '
-alias composer='/usr/bin/php7.3 -v && /usr/bin/php7.3 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi'
+alias composer='/usr/bin/php7.3 -v && /usr/bin/php7.3 -n -d extension=bcmath.so -d extension=ctype.so -d extension=curl.so -d extension=dom.so -d extension=gd.so -d extension=gettext.so -d extension=iconv.so -d extension=intl.so -d extension=json.so -d extension=mbstring.so -d extension=mysqlnd.so -d extension=pdo.so -d extension=pdo_mysql.so -d extension=phar.so -d extension=posix.so -d extension=readline.so -d extension=simplexml.so -d extension=soap.so -d extension=sockets.so -d extension=sysvmsg.so -d extension=sysvsem.so -d extension=sysvshm.so -d extension=tokenizer.so -d extension=xml.so -d extension=xmlwriter.so -d extension=xsl.so -d extension=zip.so /usr/local/bin/composer --ansi --ignore-platform-reqs'
 alias rbm='robo --load-from /var/www/html/magento-scripts/robo/ '
 alias dpd='php -n ~/tools/dephpend '
 alias xdephp56='/var/www/html/magento-scripts/dev/enable-xdebug-php56.sh'
