@@ -37,11 +37,18 @@ set -a; . `pwd`/config-pr.env
 # Script-specific logic starts here
 #
 
+echo "
+#
+# Switching to $MAGENTO2_ENV_WEBROOT
+#
+"
 cd $MAGENTO2_ENV_WEBROOT || exit # Exit if 'cd' command fails
 
+echo "
 #
 # Prepare magento instance
 #
+"
 
 # Force checkout develop branch
 git checkout --force develop --
@@ -52,9 +59,11 @@ rm -rf app/code/Trespass/*
 # Remove and re-install vendor/trespass/ to flush out any customisations made in vendor/trespass/
 rm -rf $MAGENTO2_ENV_WEBROOT/vendor/trespass/ && $MAGENTO2_ENV_COMPOSERCOMMAND install
 
+echo "
 #
 # Prepare module being PR'd
 #
+"
 
 # Switch to modules directory
 cd /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/
@@ -70,6 +79,12 @@ cd $MAGENTO2_ENV_WEBROOT
 cp -rf /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/* $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/
 # Enable module
 /usr/bin/php7.3 -v && /usr/bin/php7.3 /var/www/html/n98-magerun2.phar --ansi mod:en $MAGENTO2_MODULE_NAME
+
+echo "
+#
 # Reset everything
+#
+"
+
 xddphp73 && cd $MAGENTO2_ENV_WEBROOT/../scripts/ && ./dev/reset-everything.sh
 cd $MAGENTO2_ENV_WEBROOT
