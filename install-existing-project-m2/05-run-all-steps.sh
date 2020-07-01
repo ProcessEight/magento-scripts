@@ -7,11 +7,6 @@
 #
 # Assumes that the project you are trying to setup DOES include the M2 source in its repo.
 #
-# Instructions
-#
-# - Run this script first to create a vanilla M2 instance
-# - Then clone your repo and copy the files into the project
-#
 
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/your-project.local/scripts
@@ -96,6 +91,13 @@ if $MAGENTO2_DB_RESET; then
 fi
 
 if $MAGENTO2_DB_IMPORT; then
+
+    if [[ ! -f $MAGENTO2_ENV_WEBROOT/mage2-dbdump.sh ]]; then
+        cd $MAGENTO2_ENV_WEBROOT
+        wget sys.sonassi.com/mage2-dbdump.sh
+        chmod +x $MAGENTO2_ENV_WEBROOT/mage2-dbdump.sh
+    fi
+
     echo "#"
     echo "# Processing db backup"
     echo "#"

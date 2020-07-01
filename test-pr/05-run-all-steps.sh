@@ -51,7 +51,7 @@ echo "
 "
 
 # Force checkout develop branch
-git checkout --force develop --
+git checkout --force develop
 # Update dev branch
 git fetch origin --recurse-submodules=no --progress --prune
 # Remove modules from app/code/ to prevent errors if the module has been added to vendor/trespass/
@@ -65,15 +65,39 @@ echo "
 #
 "
 
+# Check that module already exists
+if [[ ! -d /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/ ]]; then
+    cd /var/www/html/jacobs-turner/modules/
+    echo "
+#
+# Could not detect module git repo
+#
+# Cloning repo now to /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/
+#"
+    git clone git@bitbucket.org:trespass/trespass_$GIT_MODULE_NAME.git $GIT_MODULE_NAME
+fi
+
 # Switch to modules directory
-cd /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/
+cd /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/ || exit
 # Force checkout master branch
-git checkout --force master --
+git checkout --force master
 # Update branch
 git fetch origin --recurse-submodules=no --progress --prune
 git merge origin/master --no-stat -v
 # Switch to PR branch
-git checkout --force -b $GIT_PR_BRANCH_NAME
+git checkout --force $GIT_PR_BRANCH_NAME
+
+# Check if module is already installed in vendor/
+if [[ ! -d $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/ ]]; then
+    echo "
+#
+# Could not detect module in $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/
+#
+#"
+# Trying to install in $MAGENTO2_ENV_WEBROOT/app/code/Trespass/LayeredNavigation instead
+  exit
+fi
+
 # Copy everything to vendor/
 cd $MAGENTO2_ENV_WEBROOT
 cp -rf /var/www/html/jacobs-turner/modules/$GIT_MODULE_NAME/* $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/
@@ -86,5 +110,4 @@ echo "
 #
 "
 
-xddphp73 && cd $MAGENTO2_ENV_WEBROOT/../scripts/ && ./dev/reset-everything.sh
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT/../scripts/ && ./dev/reset-everything.sh && cd $MAGENTO2_ENV_WEBROOT
