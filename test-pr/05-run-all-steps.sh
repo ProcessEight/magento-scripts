@@ -94,7 +94,7 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/ ]]; then
 # Could not detect module in $MAGENTO2_ENV_WEBROOT/vendor/trespass/$COMPOSER_MODULE_NAME/
 #
 #"
-# Trying to install in $MAGENTO2_ENV_WEBROOT/app/code/Trespass/LayeredNavigation instead
+# @TODO Trying to install in $MAGENTO2_ENV_WEBROOT/app/code/Trespass/LayeredNavigation instead
   exit
 fi
 
