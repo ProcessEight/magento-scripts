@@ -32,14 +32,14 @@ set -a; . `pwd`/config-m2.env
 # Script-specific logic starts here
 #
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 echo "
 #
-# 50. Setup Magento 2
+# 50. Setup Magento 2 backend
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 #
 # Code generation (PRODUCTION MODE ONLY)
@@ -54,16 +54,3 @@ cd $MAGENTO2_ENV_WEBROOT
 # Now that we've generated all the possible classes that could exist,
 # generate an optimised composer class map that supports faster autoloading
 #$MAGENTO2_ENV_COMPOSERCOMMAND dump-autoload -o
-
-# Static content generation
-# There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment
-# So we need to manually clear out the pub/static folder (excluding the .htaccess file, if using Apache) to be sure
-#rm -rf pub/static/*
-#export DEPLOY_COMMAND="setup:static-content:deploy $MAGENTO2_LOCALE_CODE"
-# Exclude configured themes
-#if [[ $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDE == true ]]; then
-#    DEPLOY_COMMAND="$DEPLOY_COMMAND --exclude-theme $MAGENTO2_STATICCONTENTDEPLOY_EXCLUDEDTHEMES"
-#fi
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento $DEPLOY_COMMAND
-# Generate static assets for Admin theme
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:static-content:deploy en_US --theme Magento/backend

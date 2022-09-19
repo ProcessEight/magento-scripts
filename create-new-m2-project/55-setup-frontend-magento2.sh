@@ -32,7 +32,7 @@ set -a; . `pwd`/config-m2.env
 # Script-specific logic starts here
 #
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 # Static content generation
 # There is an issue in Magento 2 where symlinks to static files produced in developer mode are not deleted during static content deployment

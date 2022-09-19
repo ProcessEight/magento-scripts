@@ -28,7 +28,7 @@ exit
 fi
 set -a; . `pwd`/config-m2.env
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 # Disable customer access to site (whitelisted IPs can still access frontend/backend)
 php -f bin/magento maintenance:enable

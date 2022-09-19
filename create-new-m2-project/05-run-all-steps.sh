@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+#
+# Create a brand new project in M2
+#
+# Run this script when creating a brand new Magento 2 project with no pre-existing codebase
+# Run the install-existing-m2-project script when installing a Magento 2 project with a pre-existing codebase
+#
 # This script must be run from inside the scripts folder, i.e.
 # $ cd /var/www/html/your-project.local/scripts
 # $ ./update/10-prepare-composer.sh
@@ -28,24 +34,15 @@ if [[ ! -f $CONFIG_M2_FILEPATH ]]; then
 fi
 set -a; . `pwd`/config-m2.env
 
+#
+# Script-specific logic starts here
+#
+
 echo "
 #
 # 10. Prepare composer
 #
 "
-
-COMPOSER_PATH=$(which composer)
-if [[ "" == "$COMPOSER_PATH" ]]; then
-    echo "
-#
-# The script has detected that Composer is not installed.
-# The script does not have permissions to install it.
-# To continue, install Composer first
-#
-# Script cannot continue. Exiting now.
-#"
-    exit
-fi
 
 if [[ ! -f ~/.composer/auth.json ]]; then
     echo "
@@ -65,14 +62,37 @@ echo "
 # 20. Prepare database
 #
 "
+echo "#"
+echo "# Running query: DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
+echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP DATABASE IF EXISTS $MAGENTO2_DB_NAME; CREATE DATABASE $MAGENTO2_DB_NAME"
 
-# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step
-# This prevents MySQL from issuing an error if the user does not exist
+echo "#"
+echo "# Check if the user exists and if not, create a dummy user with a harmless privilege which we'll drop in the next step"
+echo "# This prevents MySQL from issuing an error if the user does not exist"
+echo "# Running query: GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT USAGE ON *.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+
+echo "#"
+echo "# Running query: DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "DROP USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+
+echo "#"
+echo "# Running query: CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "CREATE USER '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME' IDENTIFIED BY '$MAGENTO2_DB_PASSWORD'"
+
+echo "#"
+echo "# Running query: GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
+
+echo "#"
+echo "# Avoid the 'show_compatibility_56' error"
+echo "#"
+mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "SET global show_compatibility_56 = on"
 
 echo "
 #
@@ -84,7 +104,7 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     mkdir -p $MAGENTO2_ENV_WEBROOT
 
     echo "# Create a new, blank Magento 2 install"
-    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION
+    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION || exit
 else
     echo "
 #
@@ -97,7 +117,7 @@ else
     exit
 fi;
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     echo "
@@ -125,61 +145,59 @@ if [[ ! -f $MAGENTO2_ENV_WEBROOT/bin/magento ]]; then
     exit
 fi
 
+cd $MAGENTO2_ENV_WEBROOT || exit
+
 # Make sure we can execute the CLI tool
 chmod u+x bin/magento
 
 if [[ $MAGENTO2_ENV_RESETPERMISSIONS == true ]]; then
-
-echo "
+  echo "
 #
 # Updating file permissions...
 #
 "
-    # echo "# Force correct permissions on files"
-    # sudo find var generated pub/static pub/media app/etc -type f -exec chmod u+w {} \;
-    # echo "# Force correct permissions on directories"
-    # sudo find var generated pub/static pub/media app/etc -type d -exec chmod u+w {} \;
-    # echo "# Forcing correct ownership on files..."
-    # sudo find var generated pub/static pub/media app/etc -type f -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    # echo "# Forcing correct ownership on directories..."
-    # sudo find var generated pub/static pub/media app/etc -type d -exec chown $MAGENTO2_ENV_CLIUSER:$MAGENTO2_ENV_WEBSERVERGROUP {} \;
-    echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
-    sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
+  echo "# Set the group-id bit to ensure that files and directories are generated with the right ownership..."
+  sudo find var generated pub/static pub/media app/etc -type f -exec chmod g+w {} + &&
     sudo find var generated pub/static pub/media app/etc -type d -exec chmod g+ws {} +
-    echo "# Ensure a clean slate by flushing selected directories..."
-    sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
+  echo "# Ensure a clean slate by flushing selected directories..."
+  sudo rm -rf generated/code/ var/cache/ pub/static/* pub/media/*
 fi
 
 echo "
 #
 # 40. Install Magento $MAGENTO2_ENV_EDITION $MAGENTO2_ENV_VERSION
 #
+# Running command: $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE --currency=$MAGENTO2_LOCALE_CURRENCY --timezone=$MAGENTO2_LOCALE_TIMEZONE --use-rewrites=$MAGENTO2_ENV_USEREWRITES --backend-frontname=$MAGENTO2_ADMIN_FRONTNAME --admin-use-security-key=$MAGENTO2_ENV_USESECURITYKEY --session-save=$MAGENTO2_ENV_SESSIONSAVE $MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE $MAGENTO2_INSTALLCOMMAND_EXTRAARGUMENTS
+#
 "
-cd $MAGENTO2_ENV_WEBROOT
 
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:install --base-url=http://$MAGENTO2_ENV_HOSTNAME/ \
 --db-host=$MAGENTO2_DB_HOSTNAME --db-name=$MAGENTO2_DB_NAME --db-user=$MAGENTO2_DB_USERNAME --db-password=$MAGENTO2_DB_PASSWORD \
 --admin-firstname=$MAGENTO2_ADMIN_FIRSTNAME --admin-lastname=$MAGENTO2_ADMIN_LASTNAME --admin-email=$MAGENTO2_ADMIN_EMAIL \
 --admin-user=$MAGENTO2_ADMIN_USERNAME --admin-password=$MAGENTO2_ADMIN_PASSWORD --language=$MAGENTO2_LOCALE_CODE \
 --currency=$MAGENTO2_LOCALE_CURRENCY --timezone=$MAGENTO2_LOCALE_TIMEZONE --use-rewrites=$MAGENTO2_ENV_USEREWRITES --backend-frontname=$MAGENTO2_ADMIN_FRONTNAME --admin-use-security-key=$MAGENTO2_ENV_USESECURITYKEY \
---session-save=$MAGENTO2_ENV_SESSIONSAVE $MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE
+--session-save=$MAGENTO2_ENV_SESSIONSAVE $MAGENTO2_INSTALLCOMMAND_CLEANUPDATABASE $MAGENTO2_INSTALLCOMMAND_EXTRAARGUMENTS || exit
 
 echo "
 #
-# 50. Setup Magento 2
+# 50. Setup Magento 2 backend
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
-# Generate static assets for Admin theme
-#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:static-content:deploy en_US --theme Magento/backend
+echo "
+#
+# 55. Setup Magento 2 frontend
+#
+"
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 echo "
 #
 # 60. Run database changes
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 # Disable customer access to site (whitelisted IPs can still access frontend/backend)
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:enable
@@ -195,32 +213,37 @@ echo "
 # 70. Apply environment-specific settings
 #
 "
-
 echo "
+"
+echo "
+#
 # Enabling all caches
+#
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:enable
 
-
 echo "
-# Disabling full_page cache
+#
+# NOT disabling full_page cache (use mage2tv/cache-clean instead)
+#
 "
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
+#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
+#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
 
 echo "
-# Enabling developer mode
+#
+# Set developer mode
+#
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
 
 if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
     echo "
+#
 # Enabling Magento 2 cron
+#
 "
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run > $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
-    crontab /tmp/magento2-crontab
+  $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cron:install
     $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
 

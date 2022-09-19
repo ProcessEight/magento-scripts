@@ -32,15 +32,15 @@ set -a; . `pwd`/config-m2.env
 # Script-specific logic starts here
 #
 
-cd $MAGENTO2_ENV_WEBROOT
-
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 echo "
 #
 # 70. Apply environment-specific settings
 #
 "
-
+echo "
+"
 echo "
 #
 # Enabling all caches
@@ -50,15 +50,15 @@ $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:enable
 
 echo "
 #
-# Disabling full_page cache
+# NOT disabling full_page cache (use mage2tv/cache-clean instead)
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
+#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:disable full_page
+#$MAGENTO2_ENV_PHPCOMMAND -f bin/magento cache:flush full_page
 
 echo "
 #
-# Enabling developer mode
+# Set developer mode
 #
 "
 $MAGENTO2_ENV_PHPCOMMAND -f bin/magento deploy:mode:set developer
@@ -69,11 +69,8 @@ if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
 # Enabling Magento 2 cron
 #
 "
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento cron:run | grep -v \"Ran jobs by schedule\" > $MAGENTO2_ENV_WEBROOT/var/log/magento.cron.log" >> /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/update/cron.php > $MAGENTO2_ENV_WEBROOT/var/log/update.cron.log" /tmp/magento2-crontab
-    echo "* * * * * /usr/bin/$MAGENTO2_ENV_PHPCOMMAND $MAGENTO2_ENV_WEBROOT/bin/magento setup:cron:run > $MAGENTO2_ENV_WEBROOT/var/log/setup.cron.log" /tmp/magento2-crontab
-    crontab /tmp/magento2-crontab
-    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
+  $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cron:install
+  $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
 
 echo "

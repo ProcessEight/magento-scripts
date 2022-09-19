@@ -32,21 +32,23 @@ set -a; . `pwd`/config-m2.env
 # Script-specific logic starts here
 #
 
-cd $MAGENTO2_ENV_WEBROOT
+cd $MAGENTO2_ENV_WEBROOT || exit
 
 echo "
 #
-# 60. Run database changes
+# 10. Prepare composer
 #
 "
-cd $MAGENTO2_ENV_WEBROOT
 
-# Remove customer access to site (whitelisted IPs can still access frontend/backend)
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:enable
-
-# Apply database changes
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:upgrade
-
-# Allow access to site again
-$MAGENTO2_ENV_PHPCOMMAND -f bin/magento maintenance:disable
-
+if [[ ! -f ~/.composer/auth.json ]]; then
+    echo "
+#
+# The script has detected that ~/.composer/auth.json does not exist.
+# The script will not create it.
+# To continue, create it first using:
+# $ composer config -g http-basic.repo.magento.com <public_key> <private_key>
+#
+# Script cannot continue. Exiting now.
+#"
+    exit
+fi
