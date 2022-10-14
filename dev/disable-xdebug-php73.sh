@@ -3,7 +3,7 @@
 if [[ ! -f /etc/php/7.3/fpm/conf.d/20-xdebug.ini && ! -f /etc/php/7.3/cli/conf.d/20-xdebug.ini ]]; then
     echo "
 #
-# Xdebug is not enabled
+# Xdebug is not enabled for PHP7.3 FPM and PHP7.3 CLI...
 #
 ";
     /usr/bin/php7.3 -v
@@ -12,7 +12,7 @@ fi
 
 echo "
 #
-# Disabling Xdebug...
+# Disabling Xdebug for PHP7.3 FPM and PHP7.3 CLI...
 #
 ";
 sudo rm -f /etc/php/7.3/fpm/conf.d/20-xdebug.ini

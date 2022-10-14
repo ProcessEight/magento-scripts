@@ -3,7 +3,7 @@
 if [[ -f /etc/php/7.3/fpm/conf.d/20-xdebug.ini && -f /etc/php/7.3/cli/conf.d/20-xdebug.ini ]]; then
     echo "
 #
-# Xdebug is already enabled
+# Xdebug is already enabled for PHP7.3 FPM and PHP7.3 CLI...
 #
 ";
     /usr/bin/php7.3 -v
@@ -12,7 +12,7 @@ fi
 
 echo "
 #
-# Enabling Xdebug...
+# Enabling Xdebug for PHP7.3 FPM and PHP7.3 CLI...
 #
 ";
 sudo ln -s /etc/php/7.3/mods-available/xdebug.ini /etc/php/7.3/fpm/conf.d/20-xdebug.ini

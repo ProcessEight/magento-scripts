@@ -68,20 +68,21 @@ rm -rf $MAGENTO2_ENV_WEBROOT/dev/tests/unit/tmp/sandbox-*
 
 echo "
 #
-# Cleaning frontend files...
+# NOT Cleaning frontend files...
 #
 "
-echo "
-$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
-$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
-$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
-$MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
-$MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*"
-rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
-rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
-rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
-rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
-rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*
+#echo "
+#$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
+#$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
+#$MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
+#$MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
+#$MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*
+#"
+#rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/css/frontend/*
+#rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/js/frontend/*
+#rm -rf $MAGENTO2_ENV_WEBROOT/var/view_preprocessed/source/frontend/*
+#rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/frontend/*
+#rm -rf $MAGENTO2_ENV_WEBROOT/pub/static/_requirejs/frontend/*
 
 echo "
 #
@@ -117,26 +118,19 @@ echo "
 $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:flush || exit
 echo "
 #
-# Enable all caches except full_page and vertex
+# Enable all caches
 #
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable
 #
 "
-$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable config layout block_html collections reflection db_ddl compiled_config eav customer_notification config_integration config_integration_api target_rule config_webservice translate
+$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable || exit
+
 #echo "
 #
-# Enable vertex cache
-#
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable vertex
+# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page vertex
 #
 #"
-#$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:enable vertex
-echo "
-#
-# $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page
-#
-"
-$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page
+#$MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full_page vertex
 
 #echo "
 #
@@ -147,12 +141,19 @@ $MAGENTO2_ENV_PHPCOMMAND -f $MAGENTO2_ENV_WEBROOT/bin/magento cache:disable full
 
 echo "
 #
-# Restarting $MAGENTO2_ENV_PHPCOMMAND
+# Restarting all PHP services
+#
+# @todo Change this so we only restart the project PHP service
 #
 "
-#sudo service php7.1-fpm restart
-#sudo service php7.2-fpm restart
+#sudo service php7.0-fpm restart # Should we uninstall PHP7.0?
+sudo service php7.1-fpm restart
+sudo service php7.2-fpm restart
 sudo service php7.3-fpm restart
+sudo service php7.4-fpm restart
+sudo service php8.0-fpm restart
+sudo service php8.1-fpm restart
+sudo service php8.2-fpm restart
 
 echo "
 #
