@@ -19,6 +19,7 @@ alias composer1='/usr/local/bin/composer --ansi '
 alias composer2='/usr/local/bin/composer2 --ansi '
 alias rbm='robo --load-from /var/www/html/magento-scripts/robo/ '
 alias dpd='php -n ~/tools/dephpend '
+
 alias xdephp71='/var/www/html/magento-scripts/dev/enable-xdebug-php71.sh'
 alias xddphp71='/var/www/html/magento-scripts/dev/disable-xdebug-php71.sh'
 alias xdephp72='/var/www/html/magento-scripts/dev/enable-xdebug-php72.sh'
@@ -29,6 +30,9 @@ alias xdephp74='/var/www/html/magento-scripts/dev/enable-xdebug-php74.sh'
 alias xddphp74='/var/www/html/magento-scripts/dev/disable-xdebug-php74.sh'
 alias xdephp81='/var/www/html/magento-scripts/dev/enable-xdebug-php81.sh'
 alias xddphp81='/var/www/html/magento-scripts/dev/disable-xdebug-php81.sh'
+
+alias php81xde='/var/www/html/magento-scripts/dev/enable-xdebug-php81.sh'
+alias php81xdd='/var/www/html/magento-scripts/dev/disable-xdebug-php81.sh'
 
 #
 # Projects
@@ -96,7 +100,7 @@ alias mlcc='/home/zone8/.composer/vendor/bin/cache-clean.js --watch --directory 
 alias mlnb='cd /var/www/html/wearemagneto/projects/mlnb/html '
 alias mlnbmr='cd /var/www/html/wearemagneto/projects/mlnb/html && /usr/bin/php7.4 -v && /usr/bin/php7.4 /var/www/html/n98-magerun2.phar --ansi'
 alias mlnbphp='cd /var/www/html/wearemagneto/projects/mlnb/html && /usr/bin/php7.4 -v && /usr/bin/php7.4'
-alias mlnbreset='xddphp74 && cd /var/www/html/wearemagneto/projects/mlnb/scripts/ && ./dev/reset-everything.sh && cd /var/www/html/wearemagneto/projects/mlnb/html'
+alias mlnbreset='xddphp74 && cd /var/www/html/wearemagneto/projects/mlnb/scripts/ && ./dev/reset-everything.sh && cd /var/www/html/wearemagneto/projects/mlnb/html && nvm install 16.12.0 && npm i -g yarn && yarn build'
 alias mlnbxe='cd /var/www/html/wearemagneto/projects/mlnb/html && /var/www/html/magento-scripts/dev/enable-xdebug-php74.sh'
 alias mlnbxd='cd /var/www/html/wearemagneto/projects/mlnb/html && /var/www/html/magento-scripts/dev/disable-xdebug-php74.sh'
 alias mlnbmy='cd /var/www/html/wearemagneto/projects/mlnb/html && /usr/bin/mycli -u root --password=$MYSQL_PASSWORD --local-infile=1 --database=wam_mlnb'
@@ -203,6 +207,11 @@ alias mydump='mysqldump -u root --password=$MYSQL_PASSWORD'
 # Laravel
 #
 alias laravel='/usr/bin/php7.4 -v && /usr/bin/php7.4 /home/zone8/.composer/vendor/bin/laravel'
+
+#
+# MailHog
+#
+alias mailhog='/home/zone8/go/bin/MailHog'
 
 #
 # Misc
