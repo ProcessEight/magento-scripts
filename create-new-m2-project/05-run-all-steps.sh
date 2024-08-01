@@ -89,11 +89,6 @@ echo "# Running query: GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2
 echo "#"
 mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "GRANT ALL PRIVILEGES ON $MAGENTO2_DB_NAME.* TO '$MAGENTO2_DB_USERNAME'@'$MAGENTO2_DB_HOSTNAME'"
 
-echo "#"
-echo "# Avoid the 'show_compatibility_56' error"
-echo "#"
-mysql $MAGENTO2_DB_ROOTUSERNAME $MAGENTO2_DB_ROOTPASSWORD -e "SET global show_compatibility_56 = on"
-
 echo "
 #
 # 30. Prepare Magento 2
@@ -104,7 +99,8 @@ if [[ ! -d $MAGENTO2_ENV_WEBROOT ]]; then
     mkdir -p $MAGENTO2_ENV_WEBROOT
 
     echo "# Create a new, blank Magento 2 install"
-    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition $MAGENTO2_ENV_WEBROOT $MAGENTO2_ENV_VERSION || exit
+    echo "# Running command: $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition=$MAGENTO2_ENV_VERSION $MAGENTO2_ENV_WEBROOT"
+    $MAGENTO2_ENV_COMPOSERCOMMAND create-project --repository-url=https://repo.magento.com/ magento/project-$MAGENTO2_ENV_EDITION-edition=$MAGENTO2_ENV_VERSION $MAGENTO2_ENV_WEBROOT || exit
 else
     echo "
 #
@@ -215,6 +211,14 @@ echo "
 "
 echo "
 "
+
+echo "
+#
+# Disabling 2FA module
+#
+"
+$MAGENTO2_ENV_PHPCOMMAND -f bin/magento module:disable Magento_TwoFactorAuth Magento_AdminAdobeImsTwoFactorAuth
+
 echo "
 #
 # Enabling all caches
@@ -244,7 +248,7 @@ if [[ $MAGENTO2_ENV_ENABLECRON == true ]]; then
 #
 "
   $MAGENTO2_ENV_PHPCOMMAND -f bin/magento cron:install
-    $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
+  $MAGENTO2_ENV_PHPCOMMAND -f bin/magento setup:cron:run
 fi
 
 echo "
